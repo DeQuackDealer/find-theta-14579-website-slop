@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: var(--bg);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-faint: var(--fg-faint);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-muted: var(--accent-muted);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --breakpoint-xs: 420px;
+}
+
+/* Default palette (Ibis). Mirrors src/lib/palettes.ts "ibis" entry -
+   duplicated here so first paint is correct before the bootstrap script runs. */
+:root {
+  --bg: #0a0a09;
+  --bg-elevated: #131311;
+  --fg: #f4f3ef;
+  --fg-muted: #a5a49c;
+  --fg-faint: #65645c;
+  --border: #2a2a26;
+  --border-strong: #403f39;
+  --accent: #f4f3ef;
+  --accent-fg: #0a0a09;
+  --accent-muted: #8a8980;
+}
+
+[data-palette="nile"] {
+  --bg: #0a0b0d;
+  --bg-elevated: #121417;
+  --fg: #f2f3f5;
+  --fg-muted: #9ba1a8;
+  --fg-faint: #5f656c;
+  --border: #242830;
+  --border-strong: #3a4049;
+  --accent: #6f94ad;
+  --accent-fg: #08090a;
+  --accent-muted: #4d6577;
+}
+
+[data-palette="bone"] {
+  --bg: #f2f0ea;
+  --bg-elevated: #e9e6dd;
+  --fg: #151412;
+  --fg-muted: #5c5a53;
+  --fg-faint: #8c897e;
+  --border: #d8d4c8;
+  --border-strong: #c2bdad;
+  --accent: #151412;
+  --accent-fg: #f2f0ea;
+  --accent-muted: #726f65;
+}
+
+[data-palette="ash"] {
+  --bg: #0b0a09;
+  --bg-elevated: #141210;
+  --fg: #f4f2ee;
+  --fg-muted: #a6a29a;
+  --fg-faint: #67635b;
+  --border: #2b2824;
+  --border-strong: #413c35;
+  --accent: #b3925f;
+  --accent-fg: #0b0a09;
+  --accent-muted: #8a7350;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  color-scheme: dark;
+}
+
+[data-palette="bone"] {
+  color-scheme: light;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-fg);
+}
+
+.label-mono {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.6875rem;
+}
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
