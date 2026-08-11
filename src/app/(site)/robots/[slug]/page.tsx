@@ -21,7 +21,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const robot = await getRobotBySlug(slug);
   if (!robot) return {};
-  return { title: `${robot.name} | Fleet` };
+  return { title: `${robot.name} | Flock` };
 }
 
 export default async function RobotDetailPage({
@@ -45,7 +45,7 @@ export default async function RobotDetailPage({
         className="label-mono inline-flex items-center gap-1.5 text-fg-faint transition-colors hover:text-fg"
       >
         <ArrowLeft size={13} />
-        The fleet
+        The flock
         <span className="text-fg-faint">
           / {robot.seasonLabel} · {robot.seasonYear}
         </span>
@@ -67,8 +67,9 @@ export default async function RobotDetailPage({
         </p>
       </div>
 
-      <Reveal className="relative mt-10 overflow-hidden rounded-xl border border-border">
-        <div className="absolute left-5 top-5 z-10">
+      <Reveal className="corner-ticks relative mt-10 overflow-hidden border border-border">
+        <div className="absolute left-5 top-5 z-10 flex items-center gap-2">
+          <span className="size-1.5 shrink-0 rounded-full bg-accent animate-pulse-dot" />
           <span className="label-mono rounded-full border border-border-strong bg-bg-elevated/80 px-3 py-1.5 text-fg-muted backdrop-blur">
             {robot.assemblyLabel}
           </span>
@@ -92,7 +93,7 @@ export default async function RobotDetailPage({
           {images.map((img) => (
             <div
               key={img.id}
-              className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border"
+              className="relative aspect-[4/3] overflow-hidden border border-border"
             >
               <Image
                 src={img.url}

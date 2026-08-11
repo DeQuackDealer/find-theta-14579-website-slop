@@ -15,13 +15,13 @@ export function FleetSection({ robots }: { robots: Robot[] }) {
   return (
     <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
       <Reveal>
-        <SectionLabel>Meet the fleet</SectionLabel>
+        <SectionLabel index="02">Meet the flock</SectionLabel>
         <div className="flex flex-wrap items-end justify-between gap-6">
           <h2 className="max-w-2xl text-3xl leading-tight tracking-tight text-fg sm:text-4xl">
             Every machine, built for its own season, preserved in its own CAD.
           </h2>
           <Button href="/robots" variant="secondary" className="shrink-0">
-            View full fleet
+            View full flock
             <ArrowUpRight size={15} />
           </Button>
         </div>

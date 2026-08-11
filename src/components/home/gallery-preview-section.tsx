@@ -13,7 +13,7 @@ export function GalleryPreviewSection({ images }: { images: GalleryImage[] }) {
   return (
     <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
       <Reveal>
-        <SectionLabel>Gallery</SectionLabel>
+        <SectionLabel index="05">Gallery</SectionLabel>
         <h2 className="max-w-xl text-3xl leading-tight tracking-tight text-fg sm:text-4xl">
           Moments from the pits, the field, and the road.
         </h2>
@@ -27,7 +27,7 @@ export function GalleryPreviewSection({ images }: { images: GalleryImage[] }) {
           {preview.map((img, i) => (
             <div
               key={img.id}
-              className={`relative overflow-hidden rounded-lg border border-border ${
+              className={`relative overflow-hidden border border-border ${
                 i === 0 ? "col-span-2 row-span-2" : ""
               }`}
             >
@@ -40,7 +40,7 @@ export function GalleryPreviewSection({ images }: { images: GalleryImage[] }) {
               />
             </div>
           ))}
-          <div className="relative flex items-center justify-center overflow-hidden rounded-lg border border-border bg-bg-elevated">
+          <div className="relative flex items-center justify-center overflow-hidden border border-border bg-bg-elevated">
             <div className="text-center">
               <p className="font-mono text-2xl text-fg">{images.length}</p>
               <p className="label-mono mt-1 text-fg-faint">view all</p>

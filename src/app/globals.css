@@ -16,6 +16,41 @@
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
   --breakpoint-xs: 420px;
+
+  --animate-marquee: marquee 32s linear infinite;
+  --animate-pulse-dot: pulse-dot 2s ease-in-out infinite;
+  --animate-blink: blink 1.1s steps(2) infinite;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
 /* Default palette (Ibis). Mirrors src/lib/palettes.ts "ibis" entry -
@@ -102,6 +137,45 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.16em;
   font-size: 0.6875rem;
+}
+
+/* Faint structural grid, used behind HUD-style sections. Line opacity is
+   baked into the color-mix rather than a wrapper opacity so it composites
+   correctly over section backgrounds that already carry a gradient. */
+.grid-bg {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--border) 70%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--border) 70%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+/* Instrumentation-panel corner brackets. Add to a `relative` ancestor. */
+.corner-ticks {
+  position: relative;
+}
+.corner-ticks::before,
+.corner-ticks::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  width: 14px;
+  height: 14px;
+  border-color: var(--accent);
+  border-style: solid;
+  border-width: 0;
+  pointer-events: none;
+}
+.corner-ticks::before {
+  top: -1px;
+  left: -1px;
+  border-top-width: 1.5px;
+  border-left-width: 1.5px;
+}
+.corner-ticks::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom-width: 1.5px;
+  border-right-width: 1.5px;
 }
 
 .grain {

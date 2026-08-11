@@ -53,7 +53,7 @@ export default async function BlogPostPage({
       </h1>
 
       {post.coverImageUrl ? (
-        <div className="relative mt-10 aspect-[16/9] overflow-hidden rounded-lg border border-border">
+        <div className="corner-ticks relative mt-10 aspect-[16/9] overflow-hidden border border-border">
           <Image
             src={post.coverImageUrl}
             alt={post.title}

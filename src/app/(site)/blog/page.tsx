@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { Reveal } from "@/components/reveal";
+import { PageHeader } from "@/components/page-header";
+import { EmptyState } from "@/components/empty-state";
 import { getBlogPosts } from "@/lib/db/queries";
 
 export const metadata: Metadata = {
@@ -22,47 +24,51 @@ export default async function BlogPage() {
   const posts = await getBlogPosts();
 
   return (
-    <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-24">
-      <Reveal>
-        <p className="label-mono mb-4 text-fg-faint">Updates</p>
-        <h1 className="max-w-2xl text-4xl leading-tight tracking-tight text-fg sm:text-5xl">
-          News from the build room and the field.
-        </h1>
-      </Reveal>
+    <div>
+      <PageHeader
+        eyebrow="Updates"
+        title="News from the build room and the field."
+        meta={posts.length > 0 ? [{ label: "Entries", value: String(posts.length) }] : undefined}
+      />
 
-      {posts.length === 0 ? (
-        <div className="mt-16 rounded-lg border border-dashed border-border p-12 text-center text-fg-faint">
-          Nothing posted yet. Our first update is on its way.
-        </div>
-      ) : (
-        <Reveal delay={0.1}>
-          <div className="mt-14 divide-y divide-border border-t border-border">
-            {posts.map((p) => (
-              <Link
-                key={p.id}
-                href={`/blog/${p.slug}`}
-                className="group flex flex-col gap-2 py-7 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8"
-              >
-                <div className="min-w-0">
-                  <p className="label-mono text-fg-faint">
-                    {formatDate(p.publishedAt)}
-                  </p>
-                  <p className="mt-1.5 text-2xl text-fg">{p.title}</p>
-                  {p.excerpt ? (
-                    <p className="mt-1.5 max-w-lg text-sm text-fg-muted">
-                      {p.excerpt}
+      <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-24">
+        {posts.length === 0 ? (
+          <EmptyState tag="Pending · log is empty">
+            <p>Nothing posted yet. Our first update is on its way.</p>
+          </EmptyState>
+        ) : (
+          <Reveal>
+            <div className="divide-y divide-border border-t border-border">
+              {posts.map((p, i) => (
+                <Link
+                  key={p.id}
+                  href={`/blog/${p.slug}`}
+                  className="group flex flex-col gap-2 py-7 sm:flex-row sm:items-baseline sm:gap-8"
+                >
+                  <span className="label-mono hidden shrink-0 text-fg-faint sm:block">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="label-mono text-fg-faint">
+                      {formatDate(p.publishedAt)}
                     </p>
-                  ) : null}
-                </div>
-                <span className="label-mono flex shrink-0 items-center gap-1.5 text-fg-muted transition-colors group-hover:text-fg">
-                  Read
-                  <ArrowUpRight size={13} />
-                </span>
-              </Link>
-            ))}
-          </div>
-        </Reveal>
-      )}
+                    <p className="mt-1.5 text-2xl text-fg">{p.title}</p>
+                    {p.excerpt ? (
+                      <p className="mt-1.5 max-w-lg text-sm text-fg-muted">
+                        {p.excerpt}
+                      </p>
+                    ) : null}
+                  </div>
+                  <span className="label-mono flex shrink-0 items-center gap-1.5 text-fg-muted transition-colors group-hover:text-fg">
+                    Read
+                    <ArrowUpRight size={13} />
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </Reveal>
+        )}
+      </div>
     </div>
   );
 }

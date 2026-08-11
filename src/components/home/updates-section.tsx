@@ -21,7 +21,7 @@ export function UpdatesSection({ posts }: { posts: Post[] }) {
   return (
     <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
       <Reveal>
-        <SectionLabel>Latest updates</SectionLabel>
+        <SectionLabel index="04">Latest updates</SectionLabel>
       </Reveal>
 
       <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
