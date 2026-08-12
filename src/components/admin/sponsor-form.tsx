@@ -1,19 +1,27 @@
-import { TextField, SelectField } from "./field";
+"use client";
+
+import { useActionState } from "react";
+import { TextField, SelectField, FormError } from "./field";
 import { UploadField } from "./upload-field";
 import { SubmitButton } from "./submit-button";
 import type { sponsors as sponsorsTable } from "@/lib/db/schema";
 
 type Sponsor = typeof sponsorsTable.$inferSelect;
+type ActionResult = { error: string } | undefined;
 
 export function SponsorForm({
   action,
   sponsor,
 }: {
-  action: (formData: FormData) => Promise<void>;
+  action: (prevState: ActionResult, formData: FormData) => Promise<ActionResult>;
   sponsor?: Sponsor;
 }) {
+  const [state, formAction] = useActionState(action, undefined);
+
   return (
-    <form action={action} className="max-w-xl space-y-6">
+    <form action={formAction} className="max-w-xl space-y-6">
+      <FormError message={state?.error} />
+
       <TextField label="Name" name="name" defaultValue={sponsor?.name} required />
       <div className="grid grid-cols-2 gap-4">
         <SelectField

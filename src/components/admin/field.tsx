@@ -1,6 +1,15 @@
 const inputClass =
   "w-full rounded-md border border-border-strong bg-bg px-3.5 py-2.5 text-sm text-fg outline-none transition-colors focus:border-fg";
 
+export function FormError({ message }: { message?: string }) {
+  if (!message) return null;
+  return (
+    <p className="rounded-md border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+      {message}
+    </p>
+  );
+}
+
 export function TextField({
   label,
   name,

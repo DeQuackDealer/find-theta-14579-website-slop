@@ -5,7 +5,12 @@ import { redirect } from "next/navigation";
 import { getDb } from "@/lib/db";
 import { siteSettings } from "@/lib/db/schema";
 
-export async function updateSettings(formData: FormData) {
+type ActionResult = { error: string } | undefined;
+
+export async function updateSettings(
+  _prevState: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
   const fields = {
     id: 1 as const,
     teamName: String(formData.get("teamName") ?? "").trim(),
@@ -29,10 +34,14 @@ export async function updateSettings(formData: FormData) {
     updatedAt: new Date(),
   };
 
-  await getDb()
-    .insert(siteSettings)
-    .values(fields)
-    .onConflictDoUpdate({ target: siteSettings.id, set: fields });
+  try {
+    await getDb()
+      .insert(siteSettings)
+      .values(fields)
+      .onConflictDoUpdate({ target: siteSettings.id, set: fields });
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Failed to save settings." };
+  }
 
   revalidatePath("/", "layout");
   redirect("/admin/settings?saved=1");

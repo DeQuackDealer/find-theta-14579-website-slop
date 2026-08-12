@@ -1,9 +1,13 @@
-import { TextField, TextAreaField } from "./field";
+"use client";
+
+import { useActionState } from "react";
+import { TextField, TextAreaField, FormError } from "./field";
 import { UploadField } from "./upload-field";
 import { SubmitButton } from "./submit-button";
 import type { blogPosts as blogPostsTable } from "@/lib/db/schema";
 
 type Post = typeof blogPostsTable.$inferSelect;
+type ActionResult = { error: string } | undefined;
 
 function toDateInputValue(date?: Date) {
   if (!date) return new Date().toISOString().slice(0, 10);
@@ -14,11 +18,15 @@ export function BlogForm({
   action,
   post,
 }: {
-  action: (formData: FormData) => Promise<void>;
+  action: (prevState: ActionResult, formData: FormData) => Promise<ActionResult>;
   post?: Post;
 }) {
+  const [state, formAction] = useActionState(action, undefined);
+
   return (
-    <form action={action} className="max-w-2xl space-y-6">
+    <form action={formAction} className="max-w-2xl space-y-6">
+      <FormError message={state?.error} />
+
       <TextField label="Title" name="title" defaultValue={post?.title} required />
       <TextField
         label="Slug (URL)"

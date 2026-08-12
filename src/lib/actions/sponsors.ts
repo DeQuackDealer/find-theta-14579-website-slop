@@ -16,14 +16,31 @@ function readFields(formData: FormData) {
   };
 }
 
-export async function createSponsor(formData: FormData) {
-  await getDb().insert(sponsors).values(readFields(formData));
+type ActionResult = { error: string } | undefined;
+
+export async function createSponsor(
+  _prevState: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
+  try {
+    await getDb().insert(sponsors).values(readFields(formData));
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Failed to add sponsor." };
+  }
   revalidatePath("/sponsors");
   redirect("/admin/sponsors");
 }
 
-export async function updateSponsor(id: number, formData: FormData) {
-  await getDb().update(sponsors).set(readFields(formData)).where(eq(sponsors.id, id));
+export async function updateSponsor(
+  id: number,
+  _prevState: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
+  try {
+    await getDb().update(sponsors).set(readFields(formData)).where(eq(sponsors.id, id));
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Failed to save sponsor." };
+  }
   revalidatePath("/sponsors");
   redirect("/admin/sponsors");
 }

@@ -16,14 +16,31 @@ function readFields(formData: FormData) {
   };
 }
 
-export async function createAchievement(formData: FormData) {
-  await getDb().insert(achievements).values(readFields(formData));
+type ActionResult = { error: string } | undefined;
+
+export async function createAchievement(
+  _prevState: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
+  try {
+    await getDb().insert(achievements).values(readFields(formData));
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Failed to create achievement." };
+  }
   revalidatePath("/");
   redirect("/admin/achievements");
 }
 
-export async function updateAchievement(id: number, formData: FormData) {
-  await getDb().update(achievements).set(readFields(formData)).where(eq(achievements.id, id));
+export async function updateAchievement(
+  id: number,
+  _prevState: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
+  try {
+    await getDb().update(achievements).set(readFields(formData)).where(eq(achievements.id, id));
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Failed to save achievement." };
+  }
   revalidatePath("/");
   redirect("/admin/achievements");
 }

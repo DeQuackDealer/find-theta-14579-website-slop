@@ -28,20 +28,39 @@ function readRobotFields(formData: FormData) {
   };
 }
 
-export async function createRobot(formData: FormData) {
+type ActionResult = { error: string } | undefined;
+
+export async function createRobot(
+  _prevState: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
   const fields = readRobotFields(formData);
-  const [row] = await getDb().insert(robots).values(fields).returning({ id: robots.id });
+  let id: number;
+  try {
+    const [row] = await getDb().insert(robots).values(fields).returning({ id: robots.id });
+    id = row.id;
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Failed to create robot." };
+  }
   revalidatePath("/");
   revalidatePath("/robots");
-  redirect(`/admin/robots/${row.id}`);
+  redirect(`/admin/robots/${id}`);
 }
 
-export async function updateRobot(id: number, formData: FormData) {
+export async function updateRobot(
+  id: number,
+  _prevState: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
   const fields = readRobotFields(formData);
-  await getDb()
-    .update(robots)
-    .set({ ...fields, updatedAt: new Date() })
-    .where(eq(robots.id, id));
+  try {
+    await getDb()
+      .update(robots)
+      .set({ ...fields, updatedAt: new Date() })
+      .where(eq(robots.id, id));
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Failed to save robot." };
+  }
   revalidatePath("/");
   revalidatePath("/robots");
   revalidatePath(`/robots/${fields.slug}`);

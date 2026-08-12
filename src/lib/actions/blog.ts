@@ -21,16 +21,33 @@ function readFields(formData: FormData) {
   };
 }
 
-export async function createBlogPost(formData: FormData) {
-  await getDb().insert(blogPosts).values(readFields(formData));
+type ActionResult = { error: string } | undefined;
+
+export async function createBlogPost(
+  _prevState: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
+  try {
+    await getDb().insert(blogPosts).values(readFields(formData));
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Failed to publish update." };
+  }
   revalidatePath("/");
   revalidatePath("/blog");
   redirect("/admin/blog");
 }
 
-export async function updateBlogPost(id: number, formData: FormData) {
+export async function updateBlogPost(
+  id: number,
+  _prevState: ActionResult,
+  formData: FormData,
+): Promise<ActionResult> {
   const fields = readFields(formData);
-  await getDb().update(blogPosts).set(fields).where(eq(blogPosts.id, id));
+  try {
+    await getDb().update(blogPosts).set(fields).where(eq(blogPosts.id, id));
+  } catch (err) {
+    return { error: err instanceof Error ? err.message : "Failed to save update." };
+  }
   revalidatePath("/");
   revalidatePath("/blog");
   revalidatePath(`/blog/${fields.slug}`);

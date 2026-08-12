@@ -1,13 +1,7 @@
 import { getGalleryImages } from "@/lib/db/queries";
-import { UploadField } from "@/components/admin/upload-field";
-import { TextField } from "@/components/admin/field";
-import { SubmitButton } from "@/components/admin/submit-button";
 import { DeleteButton } from "@/components/admin/delete-button";
-import {
-  addGalleryImage,
-  updateGalleryCaption,
-  deleteGalleryImage,
-} from "@/lib/actions/gallery";
+import { GalleryUploadForm } from "@/components/admin/gallery-upload-form";
+import { updateGalleryCaption, deleteGalleryImage } from "@/lib/actions/gallery";
 
 export const dynamic = "force-dynamic";
 
@@ -21,18 +15,7 @@ export default async function AdminGalleryPage() {
         Photos shown on the public gallery page and the homepage preview.
       </p>
 
-      <form
-        action={addGalleryImage}
-        className="mt-8 flex max-w-xl flex-wrap items-end gap-4 rounded-lg border border-border p-5"
-      >
-        <div className="min-w-[220px] flex-1">
-          <UploadField label="Photo" name="url" accept="image/*" kind="image" />
-        </div>
-        <div className="min-w-[220px] flex-1">
-          <TextField label="Caption" name="caption" placeholder="optional" />
-        </div>
-        <SubmitButton>Add</SubmitButton>
-      </form>
+      <GalleryUploadForm />
 
       {images.length === 0 ? (
         <p className="mt-8 text-sm text-fg-faint">No photos yet.</p>

@@ -1,19 +1,27 @@
-import { TextField, TextAreaField } from "./field";
+"use client";
+
+import { useActionState } from "react";
+import { TextField, TextAreaField, FormError } from "./field";
 import { UploadField } from "./upload-field";
 import { SubmitButton } from "./submit-button";
 import type { robots as robotsTable } from "@/lib/db/schema";
 
 type Robot = typeof robotsTable.$inferSelect;
+type ActionResult = { error: string } | undefined;
 
 export function RobotForm({
   action,
   robot,
 }: {
-  action: (formData: FormData) => Promise<void>;
+  action: (prevState: ActionResult, formData: FormData) => Promise<ActionResult>;
   robot?: Robot;
 }) {
+  const [state, formAction] = useActionState(action, undefined);
+
   return (
-    <form action={action} className="max-w-2xl space-y-6">
+    <form action={formAction} className="max-w-2xl space-y-6">
+      <FormError message={state?.error} />
+
       <div className="grid grid-cols-2 gap-4">
         <TextField label="Name" name="name" defaultValue={robot?.name} required />
         <TextField

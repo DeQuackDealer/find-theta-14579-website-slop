@@ -1,18 +1,26 @@
-import { TextField, TextAreaField, CheckboxField } from "./field";
+"use client";
+
+import { useActionState } from "react";
+import { TextField, TextAreaField, CheckboxField, FormError } from "./field";
 import { SubmitButton } from "./submit-button";
 import type { achievements as achievementsTable } from "@/lib/db/schema";
 
 type Achievement = typeof achievementsTable.$inferSelect;
+type ActionResult = { error: string } | undefined;
 
 export function AchievementForm({
   action,
   achievement,
 }: {
-  action: (formData: FormData) => Promise<void>;
+  action: (prevState: ActionResult, formData: FormData) => Promise<ActionResult>;
   achievement?: Achievement;
 }) {
+  const [state, formAction] = useActionState(action, undefined);
+
   return (
-    <form action={action} className="max-w-xl space-y-6">
+    <form action={formAction} className="max-w-xl space-y-6">
+      <FormError message={state?.error} />
+
       <div className="grid grid-cols-2 gap-4">
         <TextField
           label="Season year"
