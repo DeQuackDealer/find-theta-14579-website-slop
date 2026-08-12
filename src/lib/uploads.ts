@@ -3,7 +3,11 @@
  * an oversized file is rejected instantly in the browser rather than after
  * the user has already waited through a long transfer.
  */
-export const MAX_MODEL_BYTES = 512 * 1024 * 1024; // 512 MB — CAD exports get large
+// Uploads are a single streamed PUT (multipart is unusable here - see the
+// note in components/admin/upload-field.tsx), so this ceiling is about what
+// finishes in a reasonable time rather than what Blob can store. Anything
+// larger belongs in /public/models, committed to the repo.
+export const MAX_MODEL_BYTES = 100 * 1024 * 1024; // 100 MB
 export const MAX_IMAGE_BYTES = 20 * 1024 * 1024; // 20 MB
 
 const MODEL_EXTENSIONS = [".glb", ".gltf", ".stl"];

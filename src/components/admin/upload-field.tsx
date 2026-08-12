@@ -30,7 +30,9 @@ export function UploadField({
     const limit = maxBytesFor(file.name);
     if (file.size > limit) {
       setError(
-        `That file is ${formatBytes(file.size)}. The limit is ${formatBytes(limit)}.`,
+        kind === "model"
+          ? `That file is ${formatBytes(file.size)} (limit ${formatBytes(limit)}). Export it as compressed .glb, or commit it to /public/models and enter the path instead.`
+          : `That file is ${formatBytes(file.size)}. The limit is ${formatBytes(limit)}.`,
       );
       return;
     }
@@ -39,12 +41,15 @@ export function UploadField({
     setProgress(0);
     setError(null);
     try {
+      // NOTE: do not enable `multipart` here. Multipart posts to Vercel's
+      // /api/blob/mpu endpoint, which sends no CORS headers under the
+      // handleUpload client-token flow, so the browser blocks it and the
+      // upload hangs at 0% for every file regardless of size. Multipart
+      // needs a presigned-POST route instead. Large models should be
+      // committed to /public/models rather than uploaded (see its README).
       const blob = await upload(file.name, file, {
         access: "public",
         handleUploadUrl: "/api/blob-upload",
-        // Splits large files into parts uploaded in parallel, with retries
-        // per part - substantially faster than one serial stream for models.
-        multipart: true,
         onUploadProgress: ({ percentage }) => setProgress(percentage),
       });
       setUrl(blob.url);
@@ -58,7 +63,6 @@ export function UploadField({
   return (
     <div className="space-y-2">
       <label className="label-mono block text-fg-muted">{label}</label>
-      <input type="hidden" name={name} value={url} />
       <div className="flex items-center gap-3">
         {kind === "image" && url ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -69,6 +73,28 @@ export function UploadField({
           />
         ) : null}
         <div className="flex min-w-0 flex-1 items-center gap-2">
+          {/* Editable so a file committed to /public can be referenced by
+              path (e.g. /models/thoth.glb) without going through Blob. */}
+          <input
+            name={name}
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            disabled={busy}
+            placeholder={
+              kind === "model" ? "/models/robot.glb — or upload" : "Paste a URL — or upload"
+            }
+            className="w-full min-w-0 flex-1 rounded-md border border-border-strong bg-bg px-3 py-2 text-sm text-fg outline-none transition-colors focus:border-fg disabled:opacity-50"
+          />
+          {url && !busy ? (
+            <button
+              type="button"
+              onClick={() => setUrl("")}
+              aria-label="Clear"
+              className="shrink-0 text-fg-faint transition-colors hover:text-fg"
+            >
+              <X size={14} />
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
@@ -80,40 +106,27 @@ export function UploadField({
             ) : (
               <UploadSimple size={14} />
             )}
-            {busy ? `Uploading… ${Math.round(progress)}%` : url ? "Replace" : "Upload"}
+            {busy ? `${Math.round(progress)}%` : "Upload"}
           </button>
-
-          {busy ? (
-            <div
-              className="h-1 min-w-0 flex-1 overflow-hidden rounded-full bg-bg-elevated"
-              role="progressbar"
-              aria-valuenow={Math.round(progress)}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-label="Upload progress"
-            >
-              <div
-                className="h-full bg-accent transition-[width] duration-200"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          ) : url ? (
-            <>
-              <span className="truncate text-xs text-fg-faint">
-                {url.split("/").pop()}
-              </span>
-              <button
-                type="button"
-                onClick={() => setUrl("")}
-                aria-label="Remove file"
-                className="shrink-0 text-fg-faint transition-colors hover:text-fg"
-              >
-                <X size={14} />
-              </button>
-            </>
-          ) : null}
         </div>
       </div>
+
+      {busy ? (
+        <div
+          className="h-1 w-full overflow-hidden rounded-full bg-bg-elevated"
+          role="progressbar"
+          aria-valuenow={Math.round(progress)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Upload progress"
+        >
+          <div
+            className="h-full bg-accent transition-[width] duration-200"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      ) : null}
+
       {error ? <p className="text-xs text-red-400">{error}</p> : null}
       <input
         ref={inputRef}
