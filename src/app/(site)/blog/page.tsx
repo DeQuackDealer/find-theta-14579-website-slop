@@ -26,15 +26,29 @@ export default async function BlogPage() {
   return (
     <div>
       <PageHeader
-        eyebrow="Updates"
-        title="News from the build room and the field."
-        meta={posts.length > 0 ? [{ label: "Entries", value: String(posts.length) }] : undefined}
+        eyebrow="06 / Updates"
+        title={
+          <>
+            Field notes,
+            <br />
+            <span className="text-stroke">build logs, dispatches.</span>
+          </>
+        }
+        meta={[
+          { label: "Posts", value: String(posts.length) },
+          { label: "Next post", value: "Soon" },
+        ]}
       />
 
       <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-24">
         {posts.length === 0 ? (
-          <EmptyState tag="Pending · log is empty">
-            <p>Nothing posted yet. Our first update is on its way.</p>
+          <EmptyState tag="No posts yet" title="The first dispatch is in draft.">
+            <p>
+              We&rsquo;re a young team moving fast at the start of the
+              season. Once we&rsquo;ve got real build progress to write
+              about, you&rsquo;ll find it here — unpolished, honest
+              engineering notes, not press releases.
+            </p>
           </EmptyState>
         ) : (
           <Reveal>

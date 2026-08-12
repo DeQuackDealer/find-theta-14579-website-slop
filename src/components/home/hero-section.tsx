@@ -34,6 +34,13 @@ export function HeroSection({
             "radial-gradient(ellipse at top right, color-mix(in srgb, var(--accent) 14%, transparent), transparent 65%)",
         }}
       />
+      <div
+        className="pointer-events-none absolute bottom-0 left-0 h-[320px] w-[420px] opacity-50"
+        style={{
+          background:
+            "radial-gradient(ellipse at bottom left, color-mix(in srgb, var(--accent) 10%, transparent), transparent 65%)",
+        }}
+      />
 
       <div className="relative mx-auto max-w-7xl px-5 pt-6 sm:px-8">
         <HudStatus teamNumber={teamNumber} location={location} />
@@ -41,10 +48,23 @@ export function HeroSection({
 
       <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-5 pb-16 pt-10 sm:px-8 sm:pt-14 lg:grid-cols-[1.05fr_1fr] lg:gap-6">
         <div>
-          <h1 className="text-6xl leading-[0.95] tracking-tight text-fg sm:text-7xl lg:text-[5.5rem]">
+          <h1 className="text-6xl leading-[0.95] tracking-tight text-fg sm:text-7xl lg:text-[6.5rem]">
             <span className="block">FIND</span>
-            <span className="block">
-              TH<span className="italic text-accent">eta</span>
+            <span className="flex items-center gap-2 sm:gap-3">
+              <span className="text-accent">TH</span>
+              <span className="relative inline-flex items-center justify-center">
+                <span
+                  className="relative block h-[0.82em] w-[0.82em] rounded-full border-[0.035em] border-fg/40"
+                  aria-hidden="true"
+                >
+                  <span className="absolute inset-[0.18em] rounded-full border-[0.025em] border-fg" />
+                  <span className="absolute inset-y-0 left-1/2 w-px bg-fg/60" />
+                  <span className="absolute inset-x-0 top-1/2 h-px bg-fg/60" />
+                  <span className="absolute inset-[0.42em] rounded-full bg-accent" />
+                </span>
+                <span className="text-stroke-accent">θ</span>
+              </span>
+              <span>TA</span>
             </span>
           </h1>
           <p className="mt-6 max-w-md text-base leading-relaxed text-fg-muted">

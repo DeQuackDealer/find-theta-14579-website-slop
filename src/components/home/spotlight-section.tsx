@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Lightning } from "@phosphor-icons/react/dist/ssr";
 import { Reveal } from "@/components/reveal";
+import { Duotone } from "@/components/duotone";
 
 export function SpotlightSection() {
   return (
@@ -12,6 +13,7 @@ export function SpotlightSection() {
         className="object-cover grayscale"
         sizes="100vw"
       />
+      <Duotone />
       <div className="grid-bg absolute inset-0 opacity-30" />
       <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/20 to-transparent" />
       <Reveal className="absolute inset-x-0 bottom-0 px-5 pb-10 sm:px-8 sm:pb-14">

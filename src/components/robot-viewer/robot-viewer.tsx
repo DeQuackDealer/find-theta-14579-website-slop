@@ -7,7 +7,9 @@ import { HotspotPins, type Hotspot } from "./hotspot-pins";
 import { cn } from "@/lib/utils";
 
 function useFgColor() {
-  const [color, setColor] = useState("#f4f3ef");
+  // Matches the default (Amber) palette's --fg so the first frame renders
+  // correctly before the effect below reads the real computed value.
+  const [color, setColor] = useState("#e8eaed");
 
   useEffect(() => {
     function read() {

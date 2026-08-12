@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { Reveal } from "@/components/reveal";
 import { SectionLabel } from "@/components/section-label";
+import { GhostNumber } from "@/components/ghost-number";
 import type { blogPosts as blogPostsTable } from "@/lib/db/schema";
 
 type Post = typeof blogPostsTable.$inferSelect;
@@ -19,7 +20,8 @@ export function UpdatesSection({ posts }: { posts: Post[] }) {
   const [featured, ...rest] = posts;
 
   return (
-    <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
+    <section className="relative isolate mx-auto max-w-7xl overflow-hidden px-5 py-20 sm:px-8 sm:py-28">
+      <GhostNumber n="04" className="-top-6 right-0 sm:-top-10" />
       <Reveal>
         <SectionLabel index="04">Latest updates</SectionLabel>
       </Reveal>

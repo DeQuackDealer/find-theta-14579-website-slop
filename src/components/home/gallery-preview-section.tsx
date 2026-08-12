@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/reveal";
 import { SectionLabel } from "@/components/section-label";
+import { Duotone } from "@/components/duotone";
+import { GhostNumber } from "@/components/ghost-number";
 import type { galleryImages as galleryTable } from "@/lib/db/schema";
 
 type GalleryImage = typeof galleryTable.$inferSelect;
@@ -11,7 +13,8 @@ export function GalleryPreviewSection({ images }: { images: GalleryImage[] }) {
   const preview = images.slice(0, 5);
 
   return (
-    <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
+    <section className="relative isolate mx-auto max-w-7xl overflow-hidden px-5 py-20 sm:px-8 sm:py-28">
+      <GhostNumber n="05" className="-bottom-10 right-0" />
       <Reveal>
         <SectionLabel index="05">Gallery</SectionLabel>
         <h2 className="max-w-xl text-3xl leading-tight tracking-tight text-fg sm:text-4xl">
@@ -38,6 +41,7 @@ export function GalleryPreviewSection({ images }: { images: GalleryImage[] }) {
                 className="object-cover grayscale transition-transform duration-500 hover:scale-105"
                 sizes="(min-width: 640px) 25vw, 50vw"
               />
+              <Duotone />
             </div>
           ))}
           <div className="relative flex items-center justify-center overflow-hidden border border-border bg-bg-elevated">

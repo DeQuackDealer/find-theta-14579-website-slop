@@ -15,7 +15,7 @@ export default async function AdminAchievementsPage() {
         <h1 className="text-2xl text-fg">Achievements</h1>
         <Link
           href="/admin/achievements/new"
-          className="flex items-center gap-1.5 rounded-md bg-fg px-4 py-2 text-sm font-medium text-bg transition-opacity hover:opacity-85"
+          className="flex items-center gap-1.5 rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-fg transition-opacity hover:opacity-85"
         >
           <Plus size={14} weight="bold" />
           New achievement

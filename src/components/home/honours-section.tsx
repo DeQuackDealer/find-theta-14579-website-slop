@@ -2,6 +2,7 @@ import { Star } from "@phosphor-icons/react/dist/ssr";
 import { Reveal } from "@/components/reveal";
 import { SectionLabel } from "@/components/section-label";
 import { EmptyState } from "@/components/empty-state";
+import { GhostNumber } from "@/components/ghost-number";
 import type { achievements as achievementsTable } from "@/lib/db/schema";
 
 type Achievement = typeof achievementsTable.$inferSelect;
@@ -14,7 +15,11 @@ export function HonoursSection({
   count: number;
 }) {
   return (
-    <section id="awards" className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
+    <section
+      id="awards"
+      className="relative isolate mx-auto max-w-7xl overflow-hidden px-5 py-20 sm:px-8 sm:py-28"
+    >
+      <GhostNumber n="03" className="-bottom-10 left-0" />
       <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
         <Reveal>
           <SectionLabel index="03">Record book</SectionLabel>
@@ -48,10 +53,10 @@ export function HonoursSection({
             ))}
           </div>
         ) : (
-          <EmptyState tag="Awaiting first result">
+          <EmptyState tag="Awaiting first result" title="Our first entry is still being written.">
             <p>
               Our first awards are still ahead of us. Check back after the
-              next competition.
+              next competition — or help us get there faster.
             </p>
           </EmptyState>
         )}

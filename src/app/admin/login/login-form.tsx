@@ -28,7 +28,7 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-md bg-fg px-4 py-3 text-sm font-medium text-bg transition-opacity hover:opacity-85 disabled:opacity-50"
+        className="w-full rounded-md bg-accent px-4 py-3 text-sm font-medium text-accent-fg transition-opacity hover:opacity-85 disabled:opacity-50"
       >
         {pending ? "Signing in…" : "Sign in"}
       </button>

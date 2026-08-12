@@ -8,6 +8,8 @@ import {
 import { Reveal } from "@/components/reveal";
 import { SectionLabel } from "@/components/section-label";
 import { StatCounter } from "@/components/stat-counter";
+import { Duotone } from "@/components/duotone";
+import { GhostNumber } from "@/components/ghost-number";
 
 const CAPABILITIES = [
   { icon: GearSix, title: "Design", desc: "Iterating mechanisms in CAD, prototype to competition-ready." },
@@ -28,7 +30,11 @@ export function StorySection({
   stats: { value: number; suffix?: string; label: string }[];
 }) {
   return (
-    <section id="story" className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28">
+    <section
+      id="story"
+      className="relative isolate mx-auto max-w-7xl overflow-hidden px-5 py-20 sm:px-8 sm:py-28"
+    >
+      <GhostNumber n="01" className="-top-6 right-0 sm:-top-10" />
       <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
         <Reveal>
           <SectionLabel index="01">Philosophy</SectionLabel>
@@ -44,6 +50,7 @@ export function StorySection({
                 className="object-cover grayscale"
                 sizes="(min-width: 1024px) 30vw, 60vw"
               />
+              <Duotone />
             </div>
             <div className="relative col-span-2 aspect-[3/4] overflow-hidden border border-border">
               <Image
@@ -53,6 +60,7 @@ export function StorySection({
                 className="object-cover grayscale"
                 sizes="(min-width: 1024px) 20vw, 40vw"
               />
+              <Duotone />
             </div>
           </div>
         </Reveal>

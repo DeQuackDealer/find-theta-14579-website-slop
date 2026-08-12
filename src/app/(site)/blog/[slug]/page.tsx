@@ -3,6 +3,7 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
+import { Duotone } from "@/components/duotone";
 import { getBlogPostBySlug } from "@/lib/db/queries";
 
 export const dynamic = "force-dynamic";
@@ -61,6 +62,7 @@ export default async function BlogPostPage({
             className="object-cover grayscale"
             sizes="(min-width: 768px) 42rem, 100vw"
           />
+          <Duotone />
         </div>
       ) : null}
 

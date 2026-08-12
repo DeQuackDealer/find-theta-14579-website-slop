@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { RobotViewer } from "@/components/robot-viewer";
 import { Reveal } from "@/components/reveal";
+import { Duotone } from "@/components/duotone";
 import {
   getRobotBySlug,
   getRobotHotspots,
@@ -102,6 +103,7 @@ export default async function RobotDetailPage({
                 className="object-cover grayscale"
                 sizes="(min-width: 640px) 33vw, 50vw"
               />
+              <Duotone />
             </div>
           ))}
         </div>

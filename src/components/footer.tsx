@@ -66,7 +66,7 @@ export function Footer({
             {contactEmail ? (
               <a
                 href={`mailto:${contactEmail}`}
-                className="group label-mono inline-flex w-full items-center justify-between gap-4 bg-fg px-6 py-4 text-bg transition-opacity hover:opacity-85 sm:w-auto lg:justify-start"
+                className="group label-mono inline-flex w-full items-center justify-between gap-4 bg-accent px-6 py-4 text-accent-fg transition-opacity hover:opacity-85 sm:w-auto lg:justify-start"
               >
                 {contactEmail}
                 <ArrowRight
