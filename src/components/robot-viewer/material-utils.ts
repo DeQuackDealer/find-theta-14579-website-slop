@@ -63,7 +63,6 @@ export function buildWireframeLook(source: THREE.Object3D, color: string) {
   const group = new THREE.Group();
   const triangles = countTriangles(source);
   const detail = detailFor(triangles);
-  const dense = !detail.wireframe;
   const meshCount = Math.max(1, countMeshes(source));
   const pointBudget = Math.max(MIN_POINTS_PER_PART, Math.floor(MAX_POINTS / meshCount));
   const edgeBudget = Math.max(
@@ -107,7 +106,7 @@ export function buildWireframeLook(source: THREE.Object3D, color: string) {
     group.add(edgeLines);
 
     const points = new THREE.Points(
-      buildSampledPoints(geometry, pointBudget, dense),
+      buildSurfacePoints(geometry, pointBudget),
       new THREE.PointsMaterial({
         color,
         size: detail.pointSize,
@@ -162,36 +161,86 @@ function countMeshes(source: THREE.Object3D) {
 }
 
 /**
- * Evenly strides across the vertex buffer up to `budget` points. Taking every
- * vertex on a dense export costs a great deal of memory for points that land
- * on top of each other on screen anyway.
+ * Scatters points across the mesh surface, weighted by triangle area.
+ *
+ * Sampling the vertex buffer instead would follow geometric detail rather
+ * than surface area, which on CAD is badly misleading: a large flat panel is
+ * a handful of big triangles (fewer still after decimation, which collapses
+ * coplanar regions on purpose) while a wheel of the same on-screen size is
+ * thousands of small ones. Vertex sampling therefore leaves big flat parts
+ * almost empty - a chassis plate reads as a hole between the parts bolted to
+ * it - and piles points onto the busy areas.
+ *
+ * Area weighting gives even coverage, so each part's density reflects how
+ * much of the robot it actually occupies.
  */
-function buildSampledPoints(
-  geometry: THREE.BufferGeometry,
-  budget: number,
-  dense: boolean,
-) {
+function buildSurfacePoints(geometry: THREE.BufferGeometry, budget: number) {
   const pos = geometry.attributes.position;
-  const count = pos.count;
-  const stride = Math.max(1, Math.ceil(count / budget));
-  const sampled = Math.ceil(count / stride);
+  const index = geometry.index;
+  const triangles = index ? index.count / 3 : pos.count / 3;
+  if (triangles < 1) return new THREE.BufferGeometry();
 
-  // Sparse models (the procedural placeholder) look richer with a jittered
-  // second pass; dense ones already have plenty of points.
-  const copies = !dense && sampled < 400 ? 2 : 1;
-  const out = new Float32Array(sampled * copies * 3);
+  const vertexOf = (t: number, corner: number) =>
+    index ? index.getX(t * 3 + corner) : t * 3 + corner;
 
-  let o = 0;
-  for (let c = 0; c < copies; c++) {
-    const jitter = c === 0 ? 0 : 0.015;
-    for (let i = 0; i < count; i += stride) {
-      out[o++] = pos.getX(i) + (Math.random() - 0.5) * jitter;
-      out[o++] = pos.getY(i) + (Math.random() - 0.5) * jitter;
-      out[o++] = pos.getZ(i) + (Math.random() - 0.5) * jitter;
-    }
+  // Cumulative areas, so a triangle can be picked with probability
+  // proportional to its area via one binary search per sample.
+  const cumulative = new Float64Array(triangles);
+  const a = new THREE.Vector3();
+  const b = new THREE.Vector3();
+  const c = new THREE.Vector3();
+  const ab = new THREE.Vector3();
+  const ac = new THREE.Vector3();
+  const cross = new THREE.Vector3();
+
+  let total = 0;
+  for (let t = 0; t < triangles; t++) {
+    a.fromBufferAttribute(pos, vertexOf(t, 0));
+    b.fromBufferAttribute(pos, vertexOf(t, 1));
+    c.fromBufferAttribute(pos, vertexOf(t, 2));
+    ab.subVectors(b, a);
+    ac.subVectors(c, a);
+    total += cross.crossVectors(ab, ac).length() * 0.5;
+    cumulative[t] = total;
   }
 
   const g = new THREE.BufferGeometry();
+  if (total <= 0 || !Number.isFinite(total)) return g;
+
+  const out = new Float32Array(budget * 3);
+  let o = 0;
+
+  for (let i = 0; i < budget; i++) {
+    const target = Math.random() * total;
+    let lo = 0;
+    let hi = triangles - 1;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (cumulative[mid] < target) lo = mid + 1;
+      else hi = mid;
+    }
+
+    a.fromBufferAttribute(pos, vertexOf(lo, 0));
+    b.fromBufferAttribute(pos, vertexOf(lo, 1));
+    c.fromBufferAttribute(pos, vertexOf(lo, 2));
+
+    ab.subVectors(b, a);
+    ac.subVectors(c, a);
+
+    // Uniform barycentric coordinates: reflecting the far half of the unit
+    // square back into the triangle keeps the distribution even.
+    let u = Math.random();
+    let v = Math.random();
+    if (u + v > 1) {
+      u = 1 - u;
+      v = 1 - v;
+    }
+
+    out[o++] = a.x + ab.x * u + ac.x * v;
+    out[o++] = a.y + ab.y * u + ac.y * v;
+    out[o++] = a.z + ab.z * u + ac.z * v;
+  }
+
   g.setAttribute("position", new THREE.BufferAttribute(out.subarray(0, o), 3));
   return g;
 }
