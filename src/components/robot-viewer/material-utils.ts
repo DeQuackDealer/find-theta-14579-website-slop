@@ -1,85 +1,170 @@
 import * as THREE from "three";
 
+/** Roughly how many triangles before a full wireframe turns into solid mush. */
+const DENSE_TRIANGLE_THRESHOLD = 60_000;
+/** Upper bound on rendered points, regardless of how many vertices exist. */
+const MAX_POINTS = 50_000;
+
+function countTriangles(source: THREE.Object3D) {
+  let total = 0;
+  source.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) return;
+    const geometry = child.geometry as THREE.BufferGeometry;
+    const position = geometry?.attributes?.position;
+    if (!position) return;
+    total += geometry.index ? geometry.index.count / 3 : position.count / 3;
+  });
+  return total;
+}
+
 /**
- * Rebuilds any mesh hierarchy (procedural primitives or a loaded GLTF) into
- * the site's signature look: faint wireframe fill + crisp edge lines +
- * a jittered point cloud sampled from each mesh's vertices. Used for both
- * the procedural placeholder robot and real uploaded CAD exports so the
- * two paths render identically.
+ * Rebuilds any mesh hierarchy (procedural primitives or a loaded CAD export)
+ * into the site's signature look: crisp edge lines plus a sampled point cloud,
+ * with a faint wireframe fill only where the model is sparse enough for it to
+ * read as structure rather than noise.
+ *
+ * CAD exports are dense - tens or hundreds of thousands of triangles - and
+ * drawing every triangle edge at that density produces a solid white blob.
+ * So the treatment adapts: denser models drop the wireframe fill and raise
+ * the crease angle so only real edges survive, which is both far more legible
+ * and much cheaper to build.
  */
 export function buildWireframeLook(source: THREE.Object3D, color: string) {
   const group = new THREE.Group();
+  const triangles = countTriangles(source);
+  const dense = triangles > DENSE_TRIANGLE_THRESHOLD;
+
+  // Higher crease angle keeps only meaningful edges. At 25 degrees the
+  // tessellation of every curved surface shows up as clutter.
+  const edgeThreshold = dense ? 50 : 25;
+  const pointBudget = Math.max(1, Math.floor(MAX_POINTS / Math.max(1, countMeshes(source))));
 
   source.traverse((child) => {
     if (!(child instanceof THREE.Mesh)) return;
     const geometry = child.geometry as THREE.BufferGeometry;
     if (!geometry?.attributes?.position) return;
 
-    const transform = { position: child.position, rotation: child.rotation, scale: child.scale };
+    // World transform, so nested CAD assemblies keep their layout.
+    child.updateWorldMatrix(true, false);
+    const matrix = child.matrixWorld.clone();
 
-    const wireMesh = new THREE.Mesh(
-      geometry,
-      new THREE.MeshBasicMaterial({
-        color,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.14,
-        depthWrite: false,
-      }),
-    );
-    applyTransform(wireMesh, transform);
-    group.add(wireMesh);
+    if (!dense) {
+      const wireMesh = new THREE.Mesh(
+        geometry,
+        new THREE.MeshBasicMaterial({
+          color,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.14,
+          depthWrite: false,
+        }),
+      );
+      wireMesh.applyMatrix4(matrix);
+      group.add(wireMesh);
+    }
 
     const edgeLines = new THREE.LineSegments(
-      new THREE.EdgesGeometry(geometry, 25),
-      new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.45 }),
+      new THREE.EdgesGeometry(geometry, edgeThreshold),
+      new THREE.LineBasicMaterial({
+        color,
+        transparent: true,
+        opacity: dense ? 0.32 : 0.45,
+      }),
     );
-    applyTransform(edgeLines, transform);
+    edgeLines.applyMatrix4(matrix);
     group.add(edgeLines);
 
     const points = new THREE.Points(
-      buildJitteredPoints(geometry),
+      buildSampledPoints(geometry, pointBudget, dense),
       new THREE.PointsMaterial({
         color,
-        size: 0.013,
+        size: dense ? 0.008 : 0.013,
         transparent: true,
-        opacity: 0.75,
+        opacity: dense ? 0.55 : 0.75,
         sizeAttenuation: true,
       }),
     );
-    applyTransform(points, transform);
+    points.applyMatrix4(matrix);
     group.add(points);
   });
 
   return group;
 }
 
-function applyTransform(
-  obj: THREE.Object3D,
-  t: { position: THREE.Vector3; rotation: THREE.Euler; scale: THREE.Vector3 },
-) {
-  obj.position.copy(t.position);
-  obj.rotation.copy(t.rotation);
-  obj.scale.copy(t.scale);
+function countMeshes(source: THREE.Object3D) {
+  let n = 0;
+  source.traverse((child) => {
+    if (child instanceof THREE.Mesh) n++;
+  });
+  return n;
 }
 
-function buildJitteredPoints(geometry: THREE.BufferGeometry) {
+/**
+ * Evenly strides across the vertex buffer up to `budget` points. Taking every
+ * vertex on a dense export costs a great deal of memory for points that land
+ * on top of each other on screen anyway.
+ */
+function buildSampledPoints(
+  geometry: THREE.BufferGeometry,
+  budget: number,
+  dense: boolean,
+) {
   const pos = geometry.attributes.position;
   const count = pos.count;
-  const copies = count > 400 ? 1 : 2;
-  const out = new Float32Array(count * copies * 3);
+  const stride = Math.max(1, Math.ceil(count / budget));
+  const sampled = Math.ceil(count / stride);
+
+  // Sparse models (the procedural placeholder) look richer with a jittered
+  // second pass; dense ones already have plenty of points.
+  const copies = !dense && sampled < 400 ? 2 : 1;
+  const out = new Float32Array(sampled * copies * 3);
+
   let o = 0;
   for (let c = 0; c < copies; c++) {
     const jitter = c === 0 ? 0 : 0.015;
-    for (let i = 0; i < count; i++) {
+    for (let i = 0; i < count; i += stride) {
       out[o++] = pos.getX(i) + (Math.random() - 0.5) * jitter;
       out[o++] = pos.getY(i) + (Math.random() - 0.5) * jitter;
       out[o++] = pos.getZ(i) + (Math.random() - 0.5) * jitter;
     }
   }
+
   const g = new THREE.BufferGeometry();
-  g.setAttribute("position", new THREE.BufferAttribute(out, 3));
+  g.setAttribute("position", new THREE.BufferAttribute(out.subarray(0, o), 3));
   return g;
+}
+
+/**
+ * Wraps an object so it sits centred on the origin at a consistent on-screen
+ * size. CAD exports carry no unit convention - a millimetre export arrives
+ * hundreds of times too large - so the camera can only frame them reliably
+ * once the model is normalised.
+ *
+ * Returns a new wrapper rather than mutating transforms in place: the offset
+ * is applied to the child in its own units and the scale to the parent, which
+ * keeps the two from compounding.
+ */
+export function fitObjectToRadius(object: THREE.Object3D, radius = 1.1) {
+  const box = new THREE.Box3().setFromObject(object);
+  const wrapper = new THREE.Group();
+  if (box.isEmpty()) {
+    wrapper.add(object);
+    return wrapper;
+  }
+
+  const size = new THREE.Vector3();
+  const center = new THREE.Vector3();
+  box.getSize(size);
+  box.getCenter(center);
+
+  const maxDim = Math.max(size.x, size.y, size.z);
+  object.position.sub(center);
+  wrapper.add(object);
+
+  if (maxDim > 0 && Number.isFinite(maxDim)) {
+    wrapper.scale.setScalar((radius * 2) / maxDim);
+  }
+  return wrapper;
 }
 
 /** Recolors an already-built wireframe-look group in place (palette swap). */

@@ -3,9 +3,12 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { OrbitControls } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import * as THREE from "three";
 import { buildProceduralRobot } from "./procedural-robot";
-import { buildWireframeLook, recolorWireframeLook } from "./material-utils";
+import {
+  buildWireframeLook,
+  recolorWireframeLook,
+  fitObjectToRadius,
+} from "./material-utils";
 import { AmbientDust } from "./ambient-dust";
 import { GltfModel } from "./gltf-model";
 import { StlModel } from "./stl-model";
@@ -15,11 +18,11 @@ function isStlUrl(url: string) {
 }
 
 function ProceduralModel({ color }: { color: string }) {
-  const groupRef = useRef<THREE.Group>(null);
-
   const wireframeGroup = useMemo(() => {
     const source = buildProceduralRobot();
-    return buildWireframeLook(source, color);
+    // Normalised the same way as uploaded models so the camera distances
+    // below frame the placeholder and a real robot identically.
+    return fitObjectToRadius(buildWireframeLook(source, color));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -27,11 +30,7 @@ function ProceduralModel({ color }: { color: string }) {
     recolorWireframeLook(wireframeGroup, color);
   }, [wireframeGroup, color]);
 
-  return (
-    <group ref={groupRef} scale={1.3}>
-      <primitive object={wireframeGroup} />
-    </group>
-  );
+  return <primitive object={wireframeGroup} />;
 }
 
 export function RobotScene({
@@ -79,7 +78,12 @@ export function RobotScene({
       <OrbitControls
         ref={controlsRef}
         enabled={interactive}
-        enableZoom={false}
+        // Models are normalised to a fixed radius, so these distances frame
+        // any model consistently - from filling the view to well clear of it.
+        enableZoom
+        zoomSpeed={0.6}
+        minDistance={1.6}
+        maxDistance={9}
         enablePan={false}
         autoRotate={autoRotate}
         autoRotateSpeed={0.8}
