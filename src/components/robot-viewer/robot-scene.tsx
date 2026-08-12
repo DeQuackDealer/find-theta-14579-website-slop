@@ -37,10 +37,12 @@ export function RobotScene({
   modelUrl,
   color,
   interactive = true,
+  onModelReady,
 }: {
   modelUrl?: string | null;
   color: string;
   interactive?: boolean;
+  onModelReady?: () => void;
 }) {
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
   const [autoRotate, setAutoRotate] = useState(true);
@@ -63,12 +65,15 @@ export function RobotScene({
 
   return (
     <>
-      <Suspense fallback={<ProceduralModel color={color} />}>
+      {/* While a real model loads the scene stays empty and the DOM overlay
+          carries the loading state - showing the procedural robot there would
+          read as the finished result rather than as progress. */}
+      <Suspense fallback={modelUrl ? null : <ProceduralModel color={color} />}>
         {modelUrl ? (
           isStlUrl(modelUrl) ? (
-            <StlModel url={modelUrl} color={color} />
+            <StlModel url={modelUrl} color={color} onReady={onModelReady} />
           ) : (
-            <GltfModel url={modelUrl} color={color} />
+            <GltfModel url={modelUrl} color={color} onReady={onModelReady} />
           )
         ) : (
           <ProceduralModel color={color} />

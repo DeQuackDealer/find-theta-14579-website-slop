@@ -4,8 +4,17 @@ import * as THREE from "three";
 const DENSE_TRIANGLE_THRESHOLD = 60_000;
 /** Beyond this, even crease edges need thinning or clusters go solid white. */
 const VERY_DENSE_TRIANGLE_THRESHOLD = 250_000;
-/** Upper bound on rendered points, regardless of how many vertices exist. */
+/** Upper bound on rendered points across the whole model. */
 const MAX_POINTS = 50_000;
+/**
+ * Per-part ceilings. Without these, one very dense part (an omni wheel is
+ * typically dozens of curved rollers) consumes the whole budget and renders
+ * as a solid cluster, while the chassis it is bolted to renders as a few
+ * faint lines. Capping per part keeps the visual weight of each part related
+ * to its size on screen rather than to its polygon count.
+ */
+const MAX_POINTS_PER_PART = 3_500;
+const MAX_EDGE_SEGMENTS_PER_PART = 9_000;
 
 /**
  * Detail treatment for a given mesh density. Parts like omni-wheel rollers
@@ -52,7 +61,10 @@ export function buildWireframeLook(source: THREE.Object3D, color: string) {
   const triangles = countTriangles(source);
   const detail = detailFor(triangles);
   const dense = !detail.wireframe;
-  const pointBudget = Math.max(1, Math.floor(MAX_POINTS / Math.max(1, countMeshes(source))));
+  const pointBudget = Math.min(
+    MAX_POINTS_PER_PART,
+    Math.max(1, Math.floor(MAX_POINTS / Math.max(1, countMeshes(source)))),
+  );
 
   source.traverse((child) => {
     if (!(child instanceof THREE.Mesh)) return;
@@ -79,7 +91,10 @@ export function buildWireframeLook(source: THREE.Object3D, color: string) {
     }
 
     const edgeLines = new THREE.LineSegments(
-      new THREE.EdgesGeometry(geometry, detail.edgeThreshold),
+      thinEdges(
+        new THREE.EdgesGeometry(geometry, detail.edgeThreshold),
+        MAX_EDGE_SEGMENTS_PER_PART,
+      ),
       new THREE.LineBasicMaterial({
         color,
         transparent: true,
@@ -104,6 +119,36 @@ export function buildWireframeLook(source: THREE.Object3D, color: string) {
   });
 
   return group;
+}
+
+/**
+ * Caps the number of line segments in an edges geometry by keeping every Nth
+ * segment. Strides over whole segments (pairs of vertices) rather than raw
+ * vertices, so every retained line keeps both of its endpoints instead of
+ * degenerating into a dangling point.
+ */
+function thinEdges(edges: THREE.BufferGeometry, maxSegments: number) {
+  const pos = edges.attributes.position;
+  const segments = pos.count / 2;
+  if (segments <= maxSegments) return edges;
+
+  const stride = Math.ceil(segments / maxSegments);
+  const kept = Math.ceil(segments / stride);
+  const out = new Float32Array(kept * 2 * 3);
+
+  let o = 0;
+  for (let s = 0; s < segments; s += stride) {
+    const a = s * 2;
+    const b = a + 1;
+    out[o++] = pos.getX(a); out[o++] = pos.getY(a); out[o++] = pos.getZ(a);
+    out[o++] = pos.getX(b); out[o++] = pos.getY(b); out[o++] = pos.getZ(b);
+  }
+
+  const thinned = new THREE.BufferGeometry();
+  thinned.setAttribute("position", new THREE.BufferAttribute(out.subarray(0, o), 3));
+  // The full-resolution geometry is not retained anywhere else.
+  edges.dispose();
+  return thinned;
 }
 
 function countMeshes(source: THREE.Object3D) {

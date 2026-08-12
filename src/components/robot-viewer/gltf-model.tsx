@@ -8,7 +8,15 @@ import {
   fitObjectToRadius,
 } from "./material-utils";
 
-export function GltfModel({ url, color }: { url: string; color: string }) {
+export function GltfModel({
+  url,
+  color,
+  onReady,
+}: {
+  url: string;
+  color: string;
+  onReady?: () => void;
+}) {
   const { scene } = useGLTF(url);
 
   const fitted = useMemo(
@@ -20,6 +28,12 @@ export function GltfModel({ url, color }: { url: string; color: string }) {
   useEffect(() => {
     recolorWireframeLook(fitted, color);
   }, [fitted, color]);
+
+  // Runs once the geometry above has been built, which is the expensive part
+  // and happens well after the download itself finishes.
+  useEffect(() => {
+    onReady?.();
+  }, [fitted, onReady]);
 
   return <primitive object={fitted} />;
 }
