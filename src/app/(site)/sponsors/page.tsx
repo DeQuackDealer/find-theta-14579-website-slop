@@ -10,6 +10,7 @@ import { PageHeader } from "@/components/page-header";
 import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 import { getSponsors, getSettings } from "@/lib/db/queries";
+import { resolveCopy } from "@/lib/site-copy";
 
 export const metadata: Metadata = {
   title: "Sponsors",
@@ -28,6 +29,7 @@ const FUNDS = [
 
 export default async function SponsorsPage() {
   const [sponsors, settings] = await Promise.all([getSponsors(), getSettings()]);
+  const copy = resolveCopy(settings);
 
   const tiers = TIER_ORDER.map((tier) => ({
     tier,
@@ -45,7 +47,7 @@ export default async function SponsorsPage() {
             <em className="text-accent not-italic">backed by people who believe in it.</em>
           </>
         }
-        subtitle="Robotics isn't cheap. Every part, tool, and trip to competition is funded through sponsorship. If you or your organisation want in, we'd love to talk."
+        subtitle={copy.sponsorsIntro}
         meta={[
           { label: "Sponsors", value: String(sponsors.length) },
           { label: "Status", value: sponsors.length > 0 ? "Active" : "Recruiting" },
@@ -55,12 +57,7 @@ export default async function SponsorsPage() {
       <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-24">
         {tiers.length === 0 ? (
           <EmptyState tag="Sponsor roster · open" title="Want to be the first name on this wall?">
-            <p>
-              We are building our sponsor roster for this season. Whether
-              you&rsquo;re a local business, a family friend, or an
-              organisation that believes in student engineering, there&rsquo;s
-              a place for you here.
-            </p>
+            <p>{copy.sponsorsEmpty}</p>
             {settings.contactEmail ? (
               <Button href={`mailto:${settings.contactEmail}?subject=Sponsorship`} variant="secondary">
                 Get in touch

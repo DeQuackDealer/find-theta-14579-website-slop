@@ -1,4 +1,5 @@
 import { asc, desc, eq } from "drizzle-orm";
+import { BLANK_COPY } from "@/lib/site-copy";
 import { getDb } from "./index";
 import {
   robots,
@@ -16,10 +17,7 @@ const DEFAULT_SETTINGS = {
   teamName: "Find Theta",
   teamNumber: "14579",
   location: "",
-  heroTagline: "",
-  storyHeading: "",
-  storyParagraph1: "",
-  storyParagraph2: "",
+  ...BLANK_COPY,
   statAwards: 0,
   statMembers: 0,
   statWorldChamps: 0,

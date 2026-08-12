@@ -3,6 +3,7 @@ import { PageHeader } from "@/components/page-header";
 import { EmptyState } from "@/components/empty-state";
 import { FleetTable } from "@/components/fleet-table";
 import { getRobots, getSettings } from "@/lib/db/queries";
+import { resolveCopy } from "@/lib/site-copy";
 import { groupRobotsBySeason } from "@/lib/robots";
 
 export const metadata: Metadata = {
@@ -14,6 +15,7 @@ export const dynamic = "force-dynamic";
 export default async function RobotsPage() {
   const [robots, settings] = await Promise.all([getRobots(), getSettings()]);
   const groups = groupRobotsBySeason(robots);
+  const copy = resolveCopy(settings);
 
   return (
     <div>
@@ -41,12 +43,7 @@ export default async function RobotsPage() {
       <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-24">
         {groups.length === 0 ? (
           <EmptyState tag="Awaiting fleet data" title="Our first chassis is in the works.">
-            <p>
-              We&rsquo;re currently in the build phase. Once the season is
-              underway and we&rsquo;ve locked in our competition robot, this
-              page fills with full breakdowns: CAD, weight budgets, subsystem
-              specs, and match performance.
-            </p>
+            <p>{copy.fleetEmpty}</p>
           </EmptyState>
         ) : (
           <div className="space-y-12">

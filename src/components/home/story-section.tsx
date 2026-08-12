@@ -12,21 +12,25 @@ import { Duotone } from "@/components/duotone";
 import { GhostNumber } from "@/components/ghost-number";
 
 const CAPABILITIES = [
-  { icon: GearSix, title: "Design", desc: "Iterating mechanisms in CAD, prototype to competition-ready." },
-  { icon: Wrench, title: "Fabrication", desc: "Machining, 3D printing, and assembling every part in-house." },
-  { icon: Cpu, title: "Programming", desc: "Autonomous routines, teleop controls, and sensor fusion." },
-  { icon: Target, title: "Strategy", desc: "Reading the field, scouting opponents, adapting match to match." },
-];
+  { icon: GearSix, title: "Design" },
+  { icon: Wrench, title: "Fabrication" },
+  { icon: Cpu, title: "Programming" },
+  { icon: Target, title: "Strategy" },
+] as const;
+
+type CapabilityTitle = (typeof CAPABILITIES)[number]["title"];
 
 export function StorySection({
   heading,
   paragraph1,
   paragraph2,
+  capabilities,
   stats,
 }: {
   heading: string;
   paragraph1: string;
   paragraph2: string;
+  capabilities: Record<CapabilityTitle, string>;
   stats: { value: number; suffix?: string; label: string }[];
 }) {
   return (
@@ -77,7 +81,9 @@ export function StorySection({
                 <div key={c.title} className="bg-bg p-5 transition-colors hover:bg-bg-elevated">
                   <c.icon size={20} className="mb-3 text-accent" />
                   <p className="text-base text-fg">{c.title}</p>
-                  <p className="mt-1 text-sm leading-relaxed text-fg-muted">{c.desc}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-fg-muted">
+                    {capabilities[c.title]}
+                  </p>
                 </div>
               ))}
             </div>

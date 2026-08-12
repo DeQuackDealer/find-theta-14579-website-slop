@@ -50,7 +50,7 @@ export const PALETTES: Palette[] = [
   {
     id: "bone",
     name: "Paper",
-    description: "Inverted — warm paper field, ink markings, amber ticks.",
+    description: "Inverted: warm paper field, ink markings, amber ticks.",
     swatch: ["#faf8f3", "#14130f", "#c44b00"],
     vars: {
       "--bg": "#faf8f3",

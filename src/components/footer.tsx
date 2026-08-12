@@ -31,12 +31,16 @@ export function Footer({
   teamNumber,
   location,
   contactEmail,
+  about,
+  contactNote,
   socials,
 }: {
   teamName: string;
   teamNumber: string;
   location: string;
   contactEmail: string;
+  about: string;
+  contactNote: string;
   socials: Partial<Record<keyof typeof SOCIAL_ICONS, string | null>>;
 }) {
   const socialEntries = (
@@ -58,8 +62,7 @@ export function Footer({
               <em className="italic text-accent">and ships?</em>
             </h2>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-fg-muted">
-              Sponsorships, mentoring, media, or just to say hi — our inbox is
-              always open.
+              {contactNote}
             </p>
           </div>
           <div className="flex flex-col items-start gap-3 lg:items-end">
@@ -94,8 +97,7 @@ export function Footer({
           <div>
             <h4 className="mb-3 text-lg text-fg">{teamName}</h4>
             <p className="max-w-xs text-sm leading-relaxed text-fg-muted">
-              A student-run FIRST Tech Challenge team. We design, build, and
-              program competition robots with the precision of the ibis.
+              {about}
             </p>
           </div>
 

@@ -1,4 +1,5 @@
 import { getDb } from "./index";
+import { BLANK_COPY } from "../site-copy";
 import { robots, robotHotspots, galleryImages, blogPosts, siteSettings } from "./schema";
 
 async function seed() {
@@ -11,13 +12,9 @@ async function seed() {
       teamName: "Find Theta",
       teamNumber: "14579",
       location: "",
-      heroTagline:
-        "A student-run FIRST Tech Challenge team building competition robots with the precision of the ibis.",
-      storyHeading: "Different faces every season, the same core philosophy.",
-      storyParagraph1:
-        "Find Theta is a student-led FIRST Tech Challenge team, competing as team 14579. We design, build, and program every robot from a bare chassis to a competition-ready machine, season after season.",
-      storyParagraph2:
-        "We watch the ibis for a reason: an animal that thrives by staying sharp-eyed and adaptable, never boxed in by one habitat. That is the standard we hold our engineering to.",
+      // Copy stays blank on purpose: the site renders COPY_DEFAULTS
+      // (src/lib/site-copy.ts) until someone overrides it in the admin.
+      ...BLANK_COPY,
       statAwards: 0,
       statMembers: 9,
       statWorldChamps: 0,
@@ -35,7 +32,7 @@ async function seed() {
       name: "THOTH",
       tagline: "The first machine off the drawing board",
       summary:
-        "Our debut competition robot, named for the ibis-headed god of knowledge. Thoth was built to be reliable first and clever second: a simple four-wheel drivetrain, a single linear slide, and an intake tuned over dozens of bench tests before it ever saw a field.",
+        "Our first competition robot, named for the ibis-headed god of knowledge. Thoth was built to be reliable first and clever second: a plain four-wheel drivetrain, one linear slide, and an intake we tuned across dozens of bench tests before it ever saw a field.",
       seasonLabel: "DECODE",
       seasonYear: "2025-26",
       seasonNumber: 1,
@@ -104,7 +101,7 @@ async function seed() {
       slug: "welcome-to-find-theta",
       title: "Welcome to Find Theta",
       excerpt: "Our website, and our rookie season, both start here.",
-      body: `Find Theta is FIRST Tech Challenge team 14579. This site is where we will post our robots, our results, and what we learn along the way.\n\nWe are just getting started: Thoth, our first competition robot, is on the bench and our first qualifier is ahead of us. Check back after our next event for an update.`,
+      body: `Find Theta is FIRST Tech Challenge team 14579. This site is where we post our robots, our results, and whatever we work out along the way.\n\nWe are early. Thoth, our first competition robot, is on the bench, and our first qualifier is still ahead of us. Check back after the event for an update.`,
       publishedAt: new Date(),
     })
     .onConflictDoNothing();

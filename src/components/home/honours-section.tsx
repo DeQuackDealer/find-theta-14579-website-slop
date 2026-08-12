@@ -10,9 +10,13 @@ type Achievement = typeof achievementsTable.$inferSelect;
 export function HonoursSection({
   achievements,
   count,
+  note,
+  emptyBody,
 }: {
   achievements: Achievement[];
   count: number;
+  note: string;
+  emptyBody: string;
 }) {
   return (
     <section
@@ -24,9 +28,7 @@ export function HonoursSection({
         <Reveal>
           <SectionLabel index="03">Record book</SectionLabel>
           <p className="font-mono text-5xl text-fg sm:text-6xl">{count}+</p>
-          <p className="mt-2 max-w-xs text-base text-fg-muted">
-            Awards earned across our seasons so far.
-          </p>
+          <p className="mt-2 max-w-xs text-base text-fg-muted">{note}</p>
           {achievements.some((a) => a.standout) ? (
             <p className="mt-6 flex items-center gap-1.5 text-xs text-fg-faint">
               <Star size={12} weight="fill" className="text-accent" />
@@ -54,10 +56,7 @@ export function HonoursSection({
           </div>
         ) : (
           <EmptyState tag="Awaiting first result" title="Our first entry is still being written.">
-            <p>
-              Our first awards are still ahead of us. Check back after the
-              next competition — or help us get there faster.
-            </p>
+            <p>{emptyBody}</p>
           </EmptyState>
         )}
       </div>

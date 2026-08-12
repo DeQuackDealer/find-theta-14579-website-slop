@@ -4,7 +4,8 @@ import { PageHeader } from "@/components/page-header";
 import { EmptyState } from "@/components/empty-state";
 import { Duotone } from "@/components/duotone";
 import { cn } from "@/lib/utils";
-import { getGalleryImages } from "@/lib/db/queries";
+import { getGalleryImages, getSettings } from "@/lib/db/queries";
+import { resolveCopy } from "@/lib/site-copy";
 
 export const metadata: Metadata = {
   title: "Gallery",
@@ -25,7 +26,11 @@ const PLACEHOLDER_ASPECTS = [
 ];
 
 export default async function GalleryPage() {
-  const images = await getGalleryImages();
+  const [images, settings] = await Promise.all([
+    getGalleryImages(),
+    getSettings(),
+  ]);
+  const copy = resolveCopy(settings);
 
   return (
     <div>
@@ -99,12 +104,7 @@ export default async function GalleryPage() {
               title="The archive will grow with the season."
               className="mt-16 max-w-3xl md:mt-20"
             >
-              <p>
-                We take photos at every stage — sketch reviews, late nights
-                in the shop, qualifiers, and the road in between. As
-                competitions wrap and the season progresses, this grid fills
-                with real imagery.
-              </p>
+              <p>{copy.galleryEmpty}</p>
             </EmptyState>
           </>
         ) : (

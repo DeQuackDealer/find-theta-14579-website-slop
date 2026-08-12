@@ -14,7 +14,8 @@ export default async function AdminSettingsPage({
     <div>
       <h1 className="text-2xl text-fg">Settings</h1>
       <p className="mt-1 text-sm text-fg-muted">
-        Team info, homepage copy, and the site&rsquo;s default colour palette.
+        Team info, every block of body copy on the site, and the default
+        colour palette.
       </p>
       {saved ? (
         <p className="mt-4 rounded-md border border-border-strong bg-bg-elevated px-4 py-2.5 text-sm text-fg">

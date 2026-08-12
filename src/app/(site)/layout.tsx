@@ -1,6 +1,7 @@
 import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { getSettings } from "@/lib/db/queries";
+import { resolveCopy } from "@/lib/site-copy";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +11,7 @@ export default async function SiteLayout({
   children: React.ReactNode;
 }) {
   const settings = await getSettings();
+  const copy = resolveCopy(settings);
 
   return (
     <>
@@ -24,6 +26,8 @@ export default async function SiteLayout({
         teamNumber={settings.teamNumber}
         location={settings.location}
         contactEmail={settings.contactEmail}
+        about={copy.footerAbout}
+        contactNote={copy.footerContactNote}
         socials={{
           instagram: settings.socialInstagram,
           youtube: settings.socialYoutube,

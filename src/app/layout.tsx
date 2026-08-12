@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { ThemeScript } from "@/components/theme-script";
 import { getSettings } from "@/lib/db/queries";
+import { resolveCopy } from "@/lib/site-copy";
 import "./globals.css";
 
 const sans = Space_Grotesk({
@@ -22,9 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   return {
     title: `${settings.teamName} | FTC Team ${settings.teamNumber}`,
-    description:
-      settings.heroTagline ||
-      `${settings.teamName} is a FIRST Tech Challenge robotics team, competition number ${settings.teamNumber}.`,
+    description: resolveCopy(settings).heroTagline,
   };
 }
 

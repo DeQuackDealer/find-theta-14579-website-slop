@@ -3,12 +3,14 @@ import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { IbisMark } from "@/components/ibis-mark";
 import { getSettings } from "@/lib/db/queries";
+import { resolveCopy } from "@/lib/site-copy";
 import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 
 export const dynamic = "force-dynamic";
 
 export default async function NotFound() {
   const settings = await getSettings();
+  const copy = resolveCopy(settings);
 
   return (
     <>
@@ -29,8 +31,7 @@ export default async function NotFound() {
             This page drifted off the field.
           </h1>
           <p className="mt-5 max-w-md text-base leading-relaxed text-fg-muted">
-            Whatever you were looking for isn&rsquo;t here. Check the link, or
-            head back and navigate from the flock.
+            {copy.notFoundBody}
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Button href="/" variant="primary">
@@ -48,6 +49,8 @@ export default async function NotFound() {
         teamNumber={settings.teamNumber}
         location={settings.location}
         contactEmail={settings.contactEmail}
+        about={copy.footerAbout}
+        contactNote={copy.footerContactNote}
         socials={{
           instagram: settings.socialInstagram,
           youtube: settings.socialYoutube,

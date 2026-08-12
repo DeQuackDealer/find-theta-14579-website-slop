@@ -13,6 +13,7 @@ import {
   getBlogPosts,
   getGalleryImages,
 } from "@/lib/db/queries";
+import { resolveCopy } from "@/lib/site-copy";
 
 export const dynamic = "force-dynamic";
 
@@ -24,30 +25,25 @@ export default async function HomePage() {
     getBlogPosts(),
     getGalleryImages(),
   ]);
+  const copy = resolveCopy(settings);
 
   return (
     <>
       <HeroSection
         teamNumber={settings.teamNumber}
         location={settings.location}
-        tagline={
-          settings.heroTagline ||
-          "A student-run FIRST Tech Challenge team building competition robots with the precision of the ibis."
-        }
+        tagline={copy.heroTagline}
       />
       <StorySection
-        heading={
-          settings.storyHeading ||
-          "Different faces every season, the same core philosophy."
-        }
-        paragraph1={
-          settings.storyParagraph1 ||
-          `${settings.teamName} is a student-led FIRST Tech Challenge team, competing as team ${settings.teamNumber}. We design, build, and program every robot from a bare chassis to a competition-ready machine, season after season.`
-        }
-        paragraph2={
-          settings.storyParagraph2 ||
-          "We watch the ibis for a reason: an animal that thrives by staying sharp-eyed and adaptable, never boxed in by one habitat. That is the standard we hold our engineering to."
-        }
+        heading={copy.storyHeading}
+        paragraph1={copy.storyParagraph1}
+        paragraph2={copy.storyParagraph2}
+        capabilities={{
+          Design: copy.capDesign,
+          Fabrication: copy.capFabrication,
+          Programming: copy.capProgramming,
+          Strategy: copy.capStrategy,
+        }}
         stats={[
           { value: settings.statAwards, suffix: "+", label: "awards & honours" },
           { value: settings.statMembers, suffix: "+", label: "members & alumni" },
@@ -57,7 +53,12 @@ export default async function HomePage() {
       />
       <FleetSection robots={robots} />
       <SpotlightSection />
-      <HonoursSection achievements={achievements} count={settings.statAwards} />
+      <HonoursSection
+        achievements={achievements}
+        count={settings.statAwards}
+        note={copy.honoursNote}
+        emptyBody={copy.honoursEmpty}
+      />
       <UpdatesSection posts={posts} />
       <GalleryPreviewSection images={images} />
       <SponsorsCta contactEmail={settings.contactEmail} />
