@@ -2,8 +2,26 @@ import * as THREE from "three";
 
 /** Roughly how many triangles before a full wireframe turns into solid mush. */
 const DENSE_TRIANGLE_THRESHOLD = 60_000;
+/** Beyond this, even crease edges need thinning or clusters go solid white. */
+const VERY_DENSE_TRIANGLE_THRESHOLD = 250_000;
 /** Upper bound on rendered points, regardless of how many vertices exist. */
 const MAX_POINTS = 50_000;
+
+/**
+ * Detail treatment for a given mesh density. Parts like omni-wheel rollers
+ * carry enormous crease counts for their on-screen size, so past a point the
+ * only way to keep them readable is to raise the angle at which an edge is
+ * considered structural and let the fine detail drop out.
+ */
+function detailFor(triangles: number) {
+  if (triangles > VERY_DENSE_TRIANGLE_THRESHOLD) {
+    return { wireframe: false, edgeThreshold: 68, edgeOpacity: 0.24, pointOpacity: 0.4, pointSize: 0.006 };
+  }
+  if (triangles > DENSE_TRIANGLE_THRESHOLD) {
+    return { wireframe: false, edgeThreshold: 50, edgeOpacity: 0.32, pointOpacity: 0.55, pointSize: 0.008 };
+  }
+  return { wireframe: true, edgeThreshold: 25, edgeOpacity: 0.45, pointOpacity: 0.75, pointSize: 0.013 };
+}
 
 function countTriangles(source: THREE.Object3D) {
   let total = 0;
@@ -32,11 +50,8 @@ function countTriangles(source: THREE.Object3D) {
 export function buildWireframeLook(source: THREE.Object3D, color: string) {
   const group = new THREE.Group();
   const triangles = countTriangles(source);
-  const dense = triangles > DENSE_TRIANGLE_THRESHOLD;
-
-  // Higher crease angle keeps only meaningful edges. At 25 degrees the
-  // tessellation of every curved surface shows up as clutter.
-  const edgeThreshold = dense ? 50 : 25;
+  const detail = detailFor(triangles);
+  const dense = !detail.wireframe;
   const pointBudget = Math.max(1, Math.floor(MAX_POINTS / Math.max(1, countMeshes(source))));
 
   source.traverse((child) => {
@@ -48,7 +63,7 @@ export function buildWireframeLook(source: THREE.Object3D, color: string) {
     child.updateWorldMatrix(true, false);
     const matrix = child.matrixWorld.clone();
 
-    if (!dense) {
+    if (detail.wireframe) {
       const wireMesh = new THREE.Mesh(
         geometry,
         new THREE.MeshBasicMaterial({
@@ -64,11 +79,11 @@ export function buildWireframeLook(source: THREE.Object3D, color: string) {
     }
 
     const edgeLines = new THREE.LineSegments(
-      new THREE.EdgesGeometry(geometry, edgeThreshold),
+      new THREE.EdgesGeometry(geometry, detail.edgeThreshold),
       new THREE.LineBasicMaterial({
         color,
         transparent: true,
-        opacity: dense ? 0.32 : 0.45,
+        opacity: detail.edgeOpacity,
       }),
     );
     edgeLines.applyMatrix4(matrix);
@@ -78,9 +93,9 @@ export function buildWireframeLook(source: THREE.Object3D, color: string) {
       buildSampledPoints(geometry, pointBudget, dense),
       new THREE.PointsMaterial({
         color,
-        size: dense ? 0.008 : 0.013,
+        size: detail.pointSize,
         transparent: true,
-        opacity: dense ? 0.55 : 0.75,
+        opacity: detail.pointOpacity,
         sizeAttenuation: true,
       }),
     );
