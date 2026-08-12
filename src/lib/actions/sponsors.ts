@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getDb } from "@/lib/db";
 import { sponsors } from "@/lib/db/schema";
+import { getErrorMessage } from "./error";
 
 function readFields(formData: FormData) {
   return {
@@ -25,7 +26,7 @@ export async function createSponsor(
   try {
     await getDb().insert(sponsors).values(readFields(formData));
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Failed to add sponsor." };
+    return { error: getErrorMessage(err, "Failed to add sponsor.") };
   }
   revalidatePath("/sponsors");
   redirect("/admin/sponsors");
@@ -39,7 +40,7 @@ export async function updateSponsor(
   try {
     await getDb().update(sponsors).set(readFields(formData)).where(eq(sponsors.id, id));
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Failed to save sponsor." };
+    return { error: getErrorMessage(err, "Failed to save sponsor.") };
   }
   revalidatePath("/sponsors");
   redirect("/admin/sponsors");

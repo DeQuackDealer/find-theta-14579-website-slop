@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { getDb } from "@/lib/db";
 import { robots, robotHotspots, robotImages } from "@/lib/db/schema";
 import { slugify } from "@/lib/utils";
+import { getErrorMessage } from "./error";
 
 function readRobotFields(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
@@ -40,7 +41,7 @@ export async function createRobot(
     const [row] = await getDb().insert(robots).values(fields).returning({ id: robots.id });
     id = row.id;
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Failed to create robot." };
+    return { error: getErrorMessage(err, "Failed to create robot.") };
   }
   revalidatePath("/");
   revalidatePath("/robots");
@@ -59,7 +60,7 @@ export async function updateRobot(
       .set({ ...fields, updatedAt: new Date() })
       .where(eq(robots.id, id));
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Failed to save robot." };
+    return { error: getErrorMessage(err, "Failed to save robot.") };
   }
   revalidatePath("/");
   revalidatePath("/robots");

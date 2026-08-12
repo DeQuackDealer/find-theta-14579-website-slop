@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getDb } from "@/lib/db";
 import { siteSettings } from "@/lib/db/schema";
+import { getErrorMessage } from "./error";
 
 type ActionResult = { error: string } | undefined;
 
@@ -40,7 +41,7 @@ export async function updateSettings(
       .values(fields)
       .onConflictDoUpdate({ target: siteSettings.id, set: fields });
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Failed to save settings." };
+    return { error: getErrorMessage(err, "Failed to save settings.") };
   }
 
   revalidatePath("/", "layout");

@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { getDb } from "@/lib/db";
 import { blogPosts } from "@/lib/db/schema";
 import { slugify } from "@/lib/utils";
+import { getErrorMessage } from "./error";
 
 function readFields(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
@@ -30,7 +31,7 @@ export async function createBlogPost(
   try {
     await getDb().insert(blogPosts).values(readFields(formData));
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Failed to publish update." };
+    return { error: getErrorMessage(err, "Failed to publish update.") };
   }
   revalidatePath("/");
   revalidatePath("/blog");
@@ -46,7 +47,7 @@ export async function updateBlogPost(
   try {
     await getDb().update(blogPosts).set(fields).where(eq(blogPosts.id, id));
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Failed to save update." };
+    return { error: getErrorMessage(err, "Failed to save update.") };
   }
   revalidatePath("/");
   revalidatePath("/blog");

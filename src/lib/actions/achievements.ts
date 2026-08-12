@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getDb } from "@/lib/db";
 import { achievements } from "@/lib/db/schema";
+import { getErrorMessage } from "./error";
 
 function readFields(formData: FormData) {
   return {
@@ -25,7 +26,7 @@ export async function createAchievement(
   try {
     await getDb().insert(achievements).values(readFields(formData));
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Failed to create achievement." };
+    return { error: getErrorMessage(err, "Failed to create achievement.") };
   }
   revalidatePath("/");
   redirect("/admin/achievements");
@@ -39,7 +40,7 @@ export async function updateAchievement(
   try {
     await getDb().update(achievements).set(readFields(formData)).where(eq(achievements.id, id));
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Failed to save achievement." };
+    return { error: getErrorMessage(err, "Failed to save achievement.") };
   }
   revalidatePath("/");
   redirect("/admin/achievements");

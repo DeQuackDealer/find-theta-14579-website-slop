@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/lib/db";
 import { galleryImages } from "@/lib/db/schema";
+import { getErrorMessage } from "./error";
 
 type ActionResult = { error: string } | undefined;
 
@@ -20,7 +21,7 @@ export async function addGalleryImage(
       order: Number(formData.get("order") ?? Date.now()),
     });
   } catch (err) {
-    return { error: err instanceof Error ? err.message : "Failed to add photo." };
+    return { error: getErrorMessage(err, "Failed to add photo.") };
   }
   revalidatePath("/");
   revalidatePath("/gallery");
