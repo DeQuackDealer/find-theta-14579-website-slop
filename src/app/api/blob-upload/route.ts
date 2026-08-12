@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { verifySessionToken, SESSION_COOKIE_NAME } from "@/lib/auth";
+import { maxBytesFor } from "@/lib/uploads";
 
 export async function POST(request: Request) {
   const cookieStore = await cookies();
@@ -16,7 +17,7 @@ export async function POST(request: Request) {
     const jsonResponse = await handleUpload({
       body,
       request,
-      onBeforeGenerateToken: async () => ({
+      onBeforeGenerateToken: async (pathname) => ({
         allowedContentTypes: [
           "image/png",
           "image/jpeg",
@@ -30,7 +31,8 @@ export async function POST(request: Request) {
           "application/octet-stream",
         ],
         addRandomSuffix: true,
-        maximumSizeInBytes: 60 * 1024 * 1024,
+        // Models need far more headroom than photos - see src/lib/uploads.ts.
+        maximumSizeInBytes: maxBytesFor(pathname),
       }),
     });
     return NextResponse.json(jsonResponse);

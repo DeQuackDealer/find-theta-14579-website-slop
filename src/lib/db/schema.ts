@@ -109,7 +109,7 @@ export const siteSettings = pgTable("site_settings", {
   statMembers: integer("stat_members").notNull().default(0),
   statWorldChamps: integer("stat_world_champs").notNull().default(0),
   statQualRate: integer("stat_qual_rate").notNull().default(0),
-  activePalette: text("active_palette").notNull().default("monochrome"),
+  activePalette: text("active_palette").notNull().default("bone"),
   contactEmail: text("contact_email").notNull().default(""),
   socialInstagram: text("social_instagram"),
   socialYoutube: text("social_youtube"),
