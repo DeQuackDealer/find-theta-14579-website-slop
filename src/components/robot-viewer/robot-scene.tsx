@@ -8,6 +8,11 @@ import { buildProceduralRobot } from "./procedural-robot";
 import { buildWireframeLook, recolorWireframeLook } from "./material-utils";
 import { AmbientDust } from "./ambient-dust";
 import { GltfModel } from "./gltf-model";
+import { StlModel } from "./stl-model";
+
+function isStlUrl(url: string) {
+  return /\.stl(\?|$)/i.test(url);
+}
 
 function ProceduralModel({ color }: { color: string }) {
   const groupRef = useRef<THREE.Group>(null);
@@ -61,7 +66,11 @@ export function RobotScene({
     <>
       <Suspense fallback={<ProceduralModel color={color} />}>
         {modelUrl ? (
-          <GltfModel url={modelUrl} color={color} />
+          isStlUrl(modelUrl) ? (
+            <StlModel url={modelUrl} color={color} />
+          ) : (
+            <GltfModel url={modelUrl} color={color} />
+          )
         ) : (
           <ProceduralModel color={color} />
         )}

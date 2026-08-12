@@ -53,9 +53,22 @@
   }
 }
 
-/* Default palette (Amber). Mirrors src/lib/palettes.ts "ibis" entry -
+/* Default palette (Paper). Mirrors src/lib/palettes.ts "bone" entry -
    duplicated here so first paint is correct before the bootstrap script runs. */
 :root {
+  --bg: #faf8f3;
+  --bg-elevated: #f1ede3;
+  --fg: #14130f;
+  --fg-muted: #6b6459;
+  --fg-faint: #9c9488;
+  --border: #e2dcd0;
+  --border-strong: #cdc4b3;
+  --accent: #c44b00;
+  --accent-fg: #faf8f3;
+  --accent-muted: #8f5a34;
+}
+
+[data-palette="ibis"] {
   --bg: #0a0e14;
   --bg-elevated: #0f141c;
   --fg: #e8eaed;
@@ -81,19 +94,6 @@
   --accent-muted: #049483;
 }
 
-[data-palette="bone"] {
-  --bg: #faf8f3;
-  --bg-elevated: #f1ede3;
-  --fg: #14130f;
-  --fg-muted: #6b6459;
-  --fg-faint: #9c9488;
-  --border: #e2dcd0;
-  --border-strong: #cdc4b3;
-  --accent: #c44b00;
-  --accent-fg: #faf8f3;
-  --accent-muted: #8f5a34;
-}
-
 [data-palette="ash"] {
   --bg: #0d1117;
   --bg-elevated: #141b23;
@@ -112,11 +112,13 @@
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
-[data-palette="bone"] {
-  color-scheme: light;
+[data-palette="ibis"],
+[data-palette="nile"],
+[data-palette="ash"] {
+  color-scheme: dark;
 }
 
 body {

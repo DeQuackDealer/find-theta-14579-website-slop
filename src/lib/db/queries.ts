@@ -24,7 +24,7 @@ const DEFAULT_SETTINGS = {
   statMembers: 0,
   statWorldChamps: 0,
   statQualRate: 0,
-  activePalette: "ibis",
+  activePalette: "bone",
   contactEmail: "",
   socialInstagram: null as string | null,
   socialYoutube: null as string | null,

@@ -95,10 +95,10 @@ export function RobotForm({
       </div>
 
       <UploadField
-        label="3D model (.glb) — optional, a placeholder wireframe shows if empty"
+        label="3D model (.glb, .gltf, or .stl) — optional, a placeholder wireframe shows if empty"
         name="modelUrl"
         defaultValue={robot?.modelUrl}
-        accept=".glb,.gltf"
+        accept=".glb,.gltf,.stl"
         kind="model"
       />
 

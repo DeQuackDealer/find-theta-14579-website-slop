@@ -19,7 +19,7 @@ export async function updateSettings(formData: FormData) {
     statMembers: Number(formData.get("statMembers") ?? 0) || 0,
     statWorldChamps: Number(formData.get("statWorldChamps") ?? 0) || 0,
     statQualRate: Number(formData.get("statQualRate") ?? 0) || 0,
-    activePalette: String(formData.get("activePalette") ?? "ibis").trim(),
+    activePalette: String(formData.get("activePalette") ?? "bone").trim(),
     contactEmail: String(formData.get("contactEmail") ?? "").trim(),
     socialInstagram: String(formData.get("socialInstagram") ?? "").trim() || null,
     socialYoutube: String(formData.get("socialYoutube") ?? "").trim() || null,

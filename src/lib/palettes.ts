@@ -87,8 +87,12 @@ export const PALETTES: Palette[] = [
   },
 ];
 
-export const DEFAULT_PALETTE: PaletteId = "ibis";
+export const DEFAULT_PALETTE: PaletteId = "bone";
 
 export function getPalette(id: string | null | undefined): Palette {
-  return PALETTES.find((p) => p.id === id) ?? PALETTES[0];
+  return (
+    PALETTES.find((p) => p.id === id) ??
+    PALETTES.find((p) => p.id === DEFAULT_PALETTE) ??
+    PALETTES[0]
+  );
 }

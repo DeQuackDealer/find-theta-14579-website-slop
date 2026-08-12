@@ -22,7 +22,7 @@ async function seed() {
       statMembers: 9,
       statWorldChamps: 0,
       statQualRate: 0,
-      activePalette: "ibis",
+      activePalette: "bone",
       contactEmail: "",
     })
     .onConflictDoNothing();
