@@ -4,17 +4,20 @@ import * as THREE from "three";
 const DENSE_TRIANGLE_THRESHOLD = 60_000;
 /** Beyond this, even crease edges need thinning or clusters go solid white. */
 const VERY_DENSE_TRIANGLE_THRESHOLD = 250_000;
-/** Upper bound on rendered points across the whole model. */
-const MAX_POINTS = 50_000;
 /**
- * Per-part ceilings. Without these, one very dense part (an omni wheel is
- * typically dozens of curved rollers) consumes the whole budget and renders
- * as a solid cluster, while the chassis it is bolted to renders as a few
- * faint lines. Capping per part keeps the visual weight of each part related
- * to its size on screen rather than to its polygon count.
+ * Budgets for the whole model, shared out evenly between its parts. The even
+ * share is what stops one very dense part (an omni wheel is typically dozens
+ * of curved rollers) from swamping the chassis it is bolted to.
+ *
+ * These must not be flat per-part ceilings. CAD is frequently exported as a
+ * single merged mesh, and a flat ceiling then applies to the entire robot at
+ * once, leaving it as scattered debris rather than a model. The floors keep
+ * individual parts usable when a model is split into very many pieces.
  */
-const MAX_POINTS_PER_PART = 3_500;
-const MAX_EDGE_SEGMENTS_PER_PART = 9_000;
+const MAX_POINTS = 50_000;
+const MAX_EDGE_SEGMENTS = 80_000;
+const MIN_POINTS_PER_PART = 200;
+const MIN_EDGE_SEGMENTS_PER_PART = 400;
 
 /**
  * Detail treatment for a given mesh density. Parts like omni-wheel rollers
@@ -61,9 +64,11 @@ export function buildWireframeLook(source: THREE.Object3D, color: string) {
   const triangles = countTriangles(source);
   const detail = detailFor(triangles);
   const dense = !detail.wireframe;
-  const pointBudget = Math.min(
-    MAX_POINTS_PER_PART,
-    Math.max(1, Math.floor(MAX_POINTS / Math.max(1, countMeshes(source)))),
+  const meshCount = Math.max(1, countMeshes(source));
+  const pointBudget = Math.max(MIN_POINTS_PER_PART, Math.floor(MAX_POINTS / meshCount));
+  const edgeBudget = Math.max(
+    MIN_EDGE_SEGMENTS_PER_PART,
+    Math.floor(MAX_EDGE_SEGMENTS / meshCount),
   );
 
   source.traverse((child) => {
@@ -91,10 +96,7 @@ export function buildWireframeLook(source: THREE.Object3D, color: string) {
     }
 
     const edgeLines = new THREE.LineSegments(
-      thinEdges(
-        new THREE.EdgesGeometry(geometry, detail.edgeThreshold),
-        MAX_EDGE_SEGMENTS_PER_PART,
-      ),
+      thinEdges(new THREE.EdgesGeometry(geometry, detail.edgeThreshold), edgeBudget),
       new THREE.LineBasicMaterial({
         color,
         transparent: true,
