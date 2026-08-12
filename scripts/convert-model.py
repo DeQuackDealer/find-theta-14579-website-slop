@@ -1,5 +1,5 @@
 """
-Convert a CAD export (STL/OBJ/PLY) into a web-ready Draco-compressed GLB.
+Convert a CAD export (STL/OBJ/PLY/GLB/GLTF) into a web-ready Draco GLB.
 
 CAD exports carry far more geometry than a browser viewer can use - a 100 MB
 STL is ~2M triangles, where ~100k is plenty for an on-screen model. This
@@ -54,6 +54,10 @@ def import_mesh(path):
             bpy.ops.wm.ply_import(filepath=path)
         else:
             bpy.ops.import_mesh.ply(filepath=path)
+    elif ext in (".glb", ".gltf"):
+        # Re-processing an already-exported GLB is the common case when the
+        # original CAD file is no longer to hand.
+        bpy.ops.import_scene.gltf(filepath=path)
     else:
         raise SystemExit(f"Unsupported input type: {ext}")
 
