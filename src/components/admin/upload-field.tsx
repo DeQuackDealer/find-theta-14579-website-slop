@@ -41,12 +41,14 @@ export function UploadField({
     setProgress(0);
     setError(null);
     try {
-      // NOTE: do not enable `multipart` here. Multipart posts to Vercel's
-      // /api/blob/mpu endpoint, which sends no CORS headers under the
-      // handleUpload client-token flow, so the browser blocks it and the
-      // upload hangs at 0% for every file regardless of size. Multipart
-      // needs a presigned-POST route instead. Large models should be
-      // committed to /public/models rather than uploaded (see its README).
+      // `multipart: true` is supported here and would speed up large files,
+      // but it is left off until it has actually been verified end to end.
+      // Note that Blob's error responses carry no CORS headers, so any
+      // failure (bad token, store misconfiguration, size rejection) surfaces
+      // in the browser as a misleading "blocked by CORS policy" message
+      // rather than the real cause - check the response with curl before
+      // concluding anything about CORS itself. Large models are better
+      // committed to /public/models than uploaded (see its README).
       const blob = await upload(file.name, file, {
         access: "public",
         handleUploadUrl: "/api/blob-upload",
