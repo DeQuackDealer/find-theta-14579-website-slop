@@ -15,7 +15,6 @@ const LINKS = [
   { href: "/gallery", label: "Gallery" },
   { href: "/blog", label: "Updates" },
   { href: "/sponsors", label: "Sponsors" },
-  { href: "/#contact", label: "Contact" },
 ];
 
 export function Nav({

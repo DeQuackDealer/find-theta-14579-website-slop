@@ -5,7 +5,6 @@ import { SpotlightSection } from "@/components/home/spotlight-section";
 import { HonoursSection } from "@/components/home/honours-section";
 import { UpdatesSection } from "@/components/home/updates-section";
 import { GalleryPreviewSection } from "@/components/home/gallery-preview-section";
-import { SponsorsCta } from "@/components/home/sponsors-cta";
 import {
   getSettings,
   getRobots,
@@ -61,7 +60,6 @@ export default async function HomePage() {
       />
       <UpdatesSection posts={posts} />
       <GalleryPreviewSection images={images} />
-      <SponsorsCta contactEmail={settings.contactEmail} />
     </>
   );
 }

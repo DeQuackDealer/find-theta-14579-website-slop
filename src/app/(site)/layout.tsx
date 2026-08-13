@@ -25,9 +25,7 @@ export default async function SiteLayout({
         teamName={settings.teamName}
         teamNumber={settings.teamNumber}
         location={settings.location}
-        contactEmail={settings.contactEmail}
         about={copy.footerAbout}
-        contactNote={copy.footerContactNote}
         socials={{
           instagram: settings.socialInstagram,
           youtube: settings.socialYoutube,

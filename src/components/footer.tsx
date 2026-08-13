@@ -5,8 +5,6 @@ import {
   LinkedinLogo,
   GithubLogo,
   ChartLineUp,
-  ArrowRight,
-  ArrowUpRight,
 } from "@phosphor-icons/react/dist/ssr";
 import { IbisMark } from "./ibis-mark";
 
@@ -30,17 +28,13 @@ export function Footer({
   teamName,
   teamNumber,
   location,
-  contactEmail,
   about,
-  contactNote,
   socials,
 }: {
   teamName: string;
   teamNumber: string;
   location: string;
-  contactEmail: string;
   about: string;
-  contactNote: string;
   socials: Partial<Record<keyof typeof SOCIAL_ICONS, string | null>>;
 }) {
   const socialEntries = (
@@ -49,49 +43,6 @@ export function Footer({
 
   return (
     <footer className="border-t border-border">
-      {/* CTA band */}
-      <div className="border-b border-border">
-        <div className="mx-auto grid max-w-7xl gap-8 px-5 py-16 sm:px-8 sm:py-20 lg:grid-cols-[1.3fr_1fr] lg:items-center lg:gap-12">
-          <div>
-            <p className="label-mono mb-4 flex items-center gap-3 text-fg-faint">
-              <span className="h-px w-6 bg-accent" aria-hidden="true" />
-              Contact
-            </p>
-            <h2 className="max-w-xl text-3xl leading-[1.08] tracking-tight text-fg sm:text-4xl lg:text-5xl">
-              Want to back a team that builds, breaks,{" "}
-              <em className="italic text-accent">and ships?</em>
-            </h2>
-            <p className="mt-4 max-w-md text-sm leading-relaxed text-fg-muted">
-              {contactNote}
-            </p>
-          </div>
-          <div className="flex flex-col items-start gap-3 lg:items-end">
-            {contactEmail ? (
-              <a
-                href={`mailto:${contactEmail}`}
-                className="group label-mono inline-flex w-full items-center justify-between gap-4 bg-accent px-6 py-4 text-accent-fg transition-opacity hover:opacity-85 sm:w-auto lg:justify-start"
-              >
-                {contactEmail}
-                <ArrowRight
-                  size={15}
-                  className="shrink-0 transition-transform group-hover:translate-x-0.5"
-                />
-              </a>
-            ) : null}
-            <Link
-              href="/sponsors"
-              className="group label-mono inline-flex w-full items-center justify-between gap-4 border border-border-strong px-6 py-4 text-fg transition-colors hover:border-fg hover:bg-bg-elevated sm:w-auto lg:justify-start"
-            >
-              Become a sponsor
-              <ArrowUpRight
-                size={15}
-                className="shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-              />
-            </Link>
-          </div>
-        </div>
-      </div>
-
       <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-20">
         <div className="grid gap-12 sm:grid-cols-3">
           <div>

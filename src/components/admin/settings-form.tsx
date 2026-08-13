@@ -119,7 +119,6 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
 
       <section className="space-y-6 border-t border-border pt-8">
         <h2 className="label-mono text-fg-faint">Footer and 404</h2>
-        <CopyField settings={settings} label="Footer contact note" name="footerContactNote" rows={2} />
         <CopyField settings={settings} label="Footer team blurb" name="footerAbout" rows={3} />
         <CopyField settings={settings} label="404 page body" name="notFoundBody" rows={3} />
       </section>

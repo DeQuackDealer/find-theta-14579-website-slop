@@ -20,7 +20,7 @@ export const COPY_DEFAULTS = {
     "Scouting the field, reading opponents, changing the plan between matches.",
   honoursNote: "Every award the flock has brought home so far.",
   honoursEmpty:
-    "Nothing on the shelf yet. Our first awards are still ahead of us, so come back after the next competition, or help us get there sooner.",
+    "Nothing on the shelf yet. Our first awards are still ahead of us, so come back after the next competition.",
   fleetEmpty:
     "We're still deep in the build phase. Once the season is running and the competition robot is locked in, this page fills out with the full breakdown: CAD, weight budgets, subsystem specs, and how each machine actually held up on the field.",
   galleryEmpty:
@@ -28,13 +28,11 @@ export const COPY_DEFAULTS = {
   updatesEmpty:
     "We're a young team moving fast through the front of the season. Once there's real build progress worth writing about, it lands here: honest engineering notes with the rough edges left in, never press releases.",
   sponsorsIntro:
-    "Robotics costs money. Every part, every tool, and every trip to a competition is paid for through sponsorship. If you or your organisation want a place on this wall, come talk to us.",
+    "Robotics costs money. Every part, every tool, and every trip to a competition is paid for by the people and organisations below. We are grateful for all of them.",
   sponsorsEmpty:
-    "We're putting together the sponsor roster for this season. Local business, family friend, or an organisation that backs student engineering, there's room for your name here.",
+    "The sponsor roster for this season is still being confirmed. Once it is, everyone backing the team appears here.",
   footerAbout:
     "A student-run FIRST Tech Challenge team. We design, build, and program our own competition robots, one season and one unknown at a time.",
-  footerContactNote:
-    "Sponsorship, mentoring, media, or a plain hello. Our inbox stays open.",
   notFoundBody:
     "Whatever you were after landed somewhere else. Check the link, or head back and find your way from the flock.",
 } satisfies Record<string, string>;
